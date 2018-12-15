@@ -24,7 +24,7 @@ import java.beans.PropertyVetoException;
  */
 @Configuration
 @ComponentScan({"com.cosmos.repository"})
-@EnableJpaRepositories(basePackages = {"com.cosmos.repository.mysql"}, transactionManagerRef = "securityTransactionManager")
+@EnableJpaRepositories(basePackages = {"com.cosmos.repository"}, transactionManagerRef = "securityTransactionManager")
 @EnableTransactionManagement
 public class MYSQLConfig {
 
@@ -111,7 +111,7 @@ public class MYSQLConfig {
 
         LocalContainerEntityManagerFactoryBean factory = new LocalContainerEntityManagerFactoryBean();
         factory.setJpaVendorAdapter(vendorAdapter);
-        factory.setPackagesToScan("com.cosmos.entity.mysql");
+        factory.setPackagesToScan("com.cosmos.entity");
         factory.setDataSource(dataSource());
         factory.afterPropertiesSet();
 
