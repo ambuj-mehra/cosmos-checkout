@@ -14,7 +14,7 @@ import javax.persistence.*;
  * @author ambujmehra
  */
 @Entity
-@Table(name = "orders")
+@Table(name = "order_state_transition")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -24,7 +24,7 @@ public class OrderStateTransition extends BaseEntity{
     @Column(name = "order_status", nullable = false)
     private Integer orderStatus;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "order_id", nullable = false)
     private Orders order;
 

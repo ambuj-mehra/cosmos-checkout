@@ -14,7 +14,7 @@ import javax.persistence.*;
  * @author ambujmehra
  */
 @Entity
-@Table(name = "order_discounts")
+@Table(name = "order_payments")
 @Getter
 @Setter
 @NoArgsConstructor

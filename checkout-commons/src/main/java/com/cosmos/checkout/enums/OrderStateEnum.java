@@ -1,6 +1,7 @@
 package com.cosmos.checkout.enums;
 
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 /**
  * The enum Order state enum.
@@ -8,6 +9,7 @@ import lombok.AllArgsConstructor;
  * @author ambujmehra
  */
 @AllArgsConstructor
+@Getter
 public enum OrderStateEnum {
 
     /**
