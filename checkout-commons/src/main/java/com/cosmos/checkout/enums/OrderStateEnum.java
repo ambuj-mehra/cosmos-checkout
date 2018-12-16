@@ -3,6 +3,10 @@ package com.cosmos.checkout.enums;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
 /**
  * The enum Order state enum.
  *
@@ -83,5 +87,96 @@ public enum OrderStateEnum {
     private Boolean isTerminalState;
 
 
+    /**
+     * The constant stateMovementList.
+     */
+    public static HashMap<OrderStateEnum, List<OrderStateEnum>> stateMovementList = new HashMap<>();
 
+    /**
+     * The Order state map.
+     */
+    public static Map<Integer, OrderStateEnum> orderStateMap;
+
+    static {
+        stateMovementList.put(ORDER_CREATED, new ArrayList<OrderStateEnum>() {
+            {
+                add(ORDER_LOYALITY_APPLIED);
+            }
+        });
+
+
+        stateMovementList.put(ORDER_LOYALITY_APPLIED, new ArrayList<OrderStateEnum>() {
+            {
+                add(ORDER_PAYMENT_INITIATE);
+            }
+        });
+
+
+        stateMovementList.put(ORDER_PAYMENT_INITIATE, new ArrayList<OrderStateEnum>() {
+            {
+                add(ORDER_PAYMENT_SUCCESS);
+                add(ORDER_PAYMENT_FAILED);
+            }
+        });
+
+
+        stateMovementList.put(ORDER_PAYMENT_SUCCESS, new ArrayList<OrderStateEnum>() {
+            {
+                add(ORDER_TOURNAMENT_JOIN_INITIATE);
+            }
+        });
+
+        stateMovementList.put(ORDER_TOURNAMENT_JOIN_INITIATE, new ArrayList<OrderStateEnum>() {
+            {
+                add(ORDER_TOURNAMNET_JOINED);
+                add(ORDER_FAILED);
+            }
+        });
+
+
+        stateMovementList.put(ORDER_TOURNAMNET_JOINED, new ArrayList<OrderStateEnum>() {
+            {
+                add(ORDER_TOURNAMENT_START);
+            }
+        });
+
+        stateMovementList.put(ORDER_TOURNAMENT_START, new ArrayList<OrderStateEnum>() {
+            {
+                add(ORDER_TOURNAMENT_END);
+                add(ORDER_FAILED);
+            }
+        });
+
+        stateMovementList.put(ORDER_TOURNAMENT_END, new ArrayList<OrderStateEnum>() {
+            {
+                add(ORDER_PRIZE_PROCESSED);
+                add(ORDER_FAILED);
+            }
+        });
+
+        stateMovementList.put(ORDER_PRIZE_PROCESSED, new ArrayList<OrderStateEnum>() {
+            {
+                add(ORDER_SUCCESS);
+                add(ORDER_CREDIT_FAILED);
+            }
+        });
+
+        orderStateMap = Arrays.stream(OrderStateEnum.values()).collect(Collectors.toMap(OrderStateEnum::getOrderState, Function.identity()));
+
+    }
+
+    /**
+     * Is valid state transition boolean.
+     *
+     * @param currentState the order state enum
+     * @param updatedState the order state enum
+     * @return the boolean
+     */
+    public static boolean isValidStateTransition(OrderStateEnum currentState, OrderStateEnum updatedState) {
+
+        if (stateMovementList.get(currentState).contains(updatedState)) {
+            return Boolean.TRUE;
+        }
+        return Boolean.FALSE;
+    }
 }

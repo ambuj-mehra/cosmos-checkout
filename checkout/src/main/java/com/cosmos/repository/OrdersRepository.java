@@ -9,4 +9,6 @@ import org.springframework.data.repository.CrudRepository;
  * @author ambujmehra
  */
 public interface OrdersRepository extends CrudRepository<Orders, Long> {
+
+    Orders findByTransactionId(String transactionId);
 }

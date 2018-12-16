@@ -15,8 +15,7 @@ public interface IcheckoutService {
      * Initiate checkout initiate checkout response.
      *
      * @param initiateCheckoutRequest the initiate checkout request
-     * @param userAuth                the user auth
      * @return the initiate checkout response
      */
-    InitiateCheckoutResponse initiateCheckout(InitiateCheckoutRequest initiateCheckoutRequest, UserAuth userAuth);
+    InitiateCheckoutResponse initiateCheckout(InitiateCheckoutRequest initiateCheckoutRequest);
 }

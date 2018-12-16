@@ -4,6 +4,7 @@ import com.cosmos.auth.bean.UserAuth;
 import com.cosmos.checkout.dto.InitiateCheckoutRequest;
 import com.cosmos.checkout.dto.InitiateCheckoutResponse;
 import com.cosmos.entity.Orders;
+import com.cosmos.exception.CheckoutException;
 import com.cosmos.repository.OrdersRepository;
 import com.cosmos.service.IcheckoutService;
 import com.cosmos.utils.CheckoutUtils;
@@ -31,10 +32,10 @@ public class CheckoutServiceImpl implements IcheckoutService {
     private OrdersRepository ordersRepository;
 
     @Override
-    @Transactional
-    public InitiateCheckoutResponse initiateCheckout(InitiateCheckoutRequest initiateCheckoutRequest, UserAuth userAuth) {
-        Orders orders = ordersRepository.save(checkoutUtils.getOrdersFromCheckoutRequest(initiateCheckoutRequest, userAuth));
-        LOGGER.info("order created in checkout Db for user :: {} with orderid :: {} and trnx id :: {}", userAuth.getUserCode(), orders.getId(), orders.getTransactionId());
+    @Transactional(rollbackOn = Exception.class)
+    public InitiateCheckoutResponse initiateCheckout(InitiateCheckoutRequest initiateCheckoutRequest) {
+        Orders orders = ordersRepository.save(checkoutUtils.getOrdersFromCheckoutRequest(initiateCheckoutRequest));
+        LOGGER.info("order created in checkout Db for user :: {} with orderid :: {} and trnx id :: {}", initiateCheckoutRequest.getUserCode(), orders.getId(), orders.getTransactionId());
         return InitiateCheckoutResponse.builder()
         .orderDate(orders.getOrderDate().getTime())
                 .orderStatus(orders.getOrderStatus())

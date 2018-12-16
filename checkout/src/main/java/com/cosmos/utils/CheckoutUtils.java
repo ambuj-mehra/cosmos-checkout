@@ -1,21 +1,25 @@
 package com.cosmos.utils;
 
-import com.cosmos.auth.bean.UserAuth;
+import com.cosmos.auth.entity.User;
+import com.cosmos.auth.repository.UserRepository;
 import com.cosmos.checkout.dto.InitiateCheckoutRequest;
 import com.cosmos.checkout.enums.OrderStateEnum;
 import com.cosmos.entity.OrderDiscount;
 import com.cosmos.entity.OrderPayment;
 import com.cosmos.entity.OrderStateTransition;
 import com.cosmos.entity.Orders;
+import com.cosmos.exception.CheckoutException;
 import com.cosmos.service.impl.CheckoutServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.apache.commons.codec.binary.Hex;
 
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 
 /**
@@ -32,14 +36,16 @@ public class CheckoutUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CheckoutServiceImpl.class);
 
+    @Autowired
+    private UserRepository userRepository;
+
     /**
      * Gets orders from checkout request.
      *
      * @param initiateCheckoutRequest the initiate checkout request
-     * @param userAuth                the user auth
      * @return the orders from checkout request
      */
-    public Orders getOrdersFromCheckoutRequest(InitiateCheckoutRequest initiateCheckoutRequest, UserAuth userAuth) {
+    public Orders getOrdersFromCheckoutRequest(InitiateCheckoutRequest initiateCheckoutRequest) {
         Orders orders = new Orders();
         orders.setActualOrderAmount(initiateCheckoutRequest.getTotalOrderAmount());
         orders.setGamecode(initiateCheckoutRequest.getGameCode());
@@ -48,8 +54,8 @@ public class CheckoutUtils {
         orders.setPlatformCode(initiateCheckoutRequest.getPlatformCode());
         orders.setTotalOrderAmount(initiateCheckoutRequest.getTotalOrderAmount());
         orders.setTournamentCode(initiateCheckoutRequest.getTournamantCode());
-        orders.setUserCode(userAuth.getUserCode());
-        orders.setTransactionId(generateUniqueTransactionId(initiateCheckoutRequest, userAuth));
+        orders.setUserCode(initiateCheckoutRequest.getUserCode());
+        orders.setTransactionId(generateUniqueTransactionId(initiateCheckoutRequest));
 
         OrderDiscount orderDiscount = new OrderDiscount();
         orderDiscount.setOrders(orders);
@@ -62,7 +68,9 @@ public class CheckoutUtils {
 
         OrderStateTransition orderStateTransition = new OrderStateTransition();
         orderStateTransition.setOrderStatus(OrderStateEnum.ORDER_CREATED.getOrderState());
+        orderStateTransition.setOrderUpdateMessage("Order Initiated");
         orderStateTransition.setOrder(orders);
+
         List<OrderStateTransition> orderStateTransitions = new ArrayList<>();
         orderStateTransitions.add(orderStateTransition);
 
@@ -77,10 +85,9 @@ public class CheckoutUtils {
      * Generate unique transaction id string.
      *
      * @param initiateCheckoutRequest the initiate checkout request
-     * @param userAuth                the user auth
      * @return the string
      */
-    public String generateUniqueTransactionId(InitiateCheckoutRequest initiateCheckoutRequest, UserAuth userAuth) {
+    public String generateUniqueTransactionId(InitiateCheckoutRequest initiateCheckoutRequest) {
         String encodeHexString = null;
         byte[] data = new byte[12];
         long currentTime = System.currentTimeMillis();
@@ -98,7 +105,9 @@ public class CheckoutUtils {
         data[2] = (byte) (currentTime >> 16);
         data[3] = (byte) (currentTime >> 8);
         data[4] = (byte) (currentTime);
-        int userId = userAuth.getUserId().intValue();
+        User user = userRepository.findByCode(initiateCheckoutRequest.getUserCode());
+        Optional.ofNullable(user).orElseThrow(() -> new CheckoutException("User not found"));
+        int userId = user.getId().intValue();
         data[5] = (byte) (userId >> 32);
         data[6] = (byte) (userId >> 24);
         data[7] = (byte) (userId >> 16);
@@ -110,7 +119,7 @@ public class CheckoutUtils {
         String name = initiateCheckoutRequest.getTournamantCode();
         String transactionId = name.substring(0, 1) + encodeHexString;
         LOGGER.info("transaction id generated for user :: {} and tournamanent :: {} is  :: {}",
-                userAuth.getUserCode(), initiateCheckoutRequest.getTournamantCode(), transactionId);
+                initiateCheckoutRequest.getUserCode(), initiateCheckoutRequest.getTournamantCode(), transactionId);
         return transactionId;
     }
 }

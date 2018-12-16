@@ -1,16 +1,15 @@
 package com.cosmos.controller;
 
-import com.cosmos.auth.bean.UserAuth;
 import com.cosmos.checkout.dto.InitiateCheckoutRequest;
 import com.cosmos.checkout.dto.InitiateCheckoutResponse;
 import com.cosmos.service.IcheckoutService;
-import com.cosmos.utils.ControllerUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletRequest;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * The type Checkout controller.
@@ -26,22 +25,11 @@ public class CheckoutController {
     @Autowired
     private IcheckoutService checkoutService;
 
-    /**
-     * Gets customer.
-     *
-     * @param request the request
-     * @return the customer
-     */
-    @ModelAttribute("user")
-    public UserAuth getCustomer(HttpServletRequest request) {
-        return ControllerUtils.getCustomer(request);
-    }
 
-    @RequestMapping(value = "initiate", method = RequestMethod.POST)
-    public InitiateCheckoutResponse initiateCheckout(@RequestBody InitiateCheckoutRequest initiateCheckoutRequest,
-                                                     @ModelAttribute("user") UserAuth userAuth) {
-        LOGGER.info("received checkout request for user :: {} for tournamant ::{} ", userAuth.getUserCode(), initiateCheckoutRequest.getTournamantCode());
-        return checkoutService.initiateCheckout(initiateCheckoutRequest, userAuth);
+    @RequestMapping(value = "/initiate", method = RequestMethod.POST)
+    public InitiateCheckoutResponse initiateCheckout(@RequestBody InitiateCheckoutRequest initiateCheckoutRequest) {
+        LOGGER.info("received checkout request for user :: {} for tournamant ::{} ", initiateCheckoutRequest.getUserCode(), initiateCheckoutRequest.getTournamantCode());
+        return checkoutService.initiateCheckout(initiateCheckoutRequest);
 
     }
 
