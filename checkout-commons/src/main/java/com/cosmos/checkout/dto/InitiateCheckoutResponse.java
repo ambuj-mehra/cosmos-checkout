@@ -3,9 +3,7 @@ package com.cosmos.checkout.dto;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.sun.org.apache.xpath.internal.operations.Bool;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 /**
  * The type Initiate checkout response.
@@ -17,6 +15,8 @@ import lombok.Setter;
 @Builder
 @JsonInclude(value = JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
+@NoArgsConstructor
+@AllArgsConstructor
 public class InitiateCheckoutResponse {
 
     private String transactionId;
