@@ -14,6 +14,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
+@Builder
 @JsonInclude(value = JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @NoArgsConstructor
