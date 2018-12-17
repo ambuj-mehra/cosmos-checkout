@@ -3,6 +3,7 @@ package com.cosmos.service.impl;
 import com.cosmos.auth.bean.UserAuth;
 import com.cosmos.checkout.dto.InitiateCheckoutRequest;
 import com.cosmos.checkout.dto.InitiateCheckoutResponse;
+import com.cosmos.checkout.enums.PaymentMode;
 import com.cosmos.entity.Orders;
 import com.cosmos.exception.CheckoutException;
 import com.cosmos.repository.OrdersRepository;
@@ -14,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 /**
  * The type Checkout service.
@@ -42,6 +45,9 @@ public class CheckoutServiceImpl implements IcheckoutService {
                 .PaymentStatus(orders.getOrderPayment().isCompleted())
                 .totalOrderAmount(orders.getTotalOrderAmount())
                 .transactionId(orders.getTransactionId())
+                .paymentOptions(Arrays.stream(PaymentMode.values())
+                        .map(InitiateCheckoutResponse.PaymentOption::getFromPaymentMode)
+                        .collect(Collectors.toList()))
                 .build();
     }
 }

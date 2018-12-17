@@ -4,6 +4,7 @@ import com.cosmos.auth.entity.User;
 import com.cosmos.auth.repository.UserRepository;
 import com.cosmos.checkout.dto.InitiateCheckoutRequest;
 import com.cosmos.checkout.enums.OrderStateEnum;
+import com.cosmos.checkout.enums.PaymentMode;
 import com.cosmos.entity.OrderDiscount;
 import com.cosmos.entity.OrderPayment;
 import com.cosmos.entity.OrderStateTransition;
@@ -64,7 +65,8 @@ public class CheckoutUtils {
         OrderPayment orderPayment = new OrderPayment();
         orderPayment.setCompleted(Boolean.FALSE);
         orderPayment.setOrders(orders);
-        orderPayment.setPaymentMode(0);//0 is PAYTM, make a enum
+        orderPayment.setPaymentMode(PaymentMode.PAYTM.getPaymentModeId());
+        //payment option will be updated in initiate payment API based on user choice
 
         OrderStateTransition orderStateTransition = new OrderStateTransition();
         orderStateTransition.setOrderStatus(OrderStateEnum.ORDER_CREATED.getOrderState());

@@ -21,7 +21,7 @@ import javax.persistence.*;
 @AllArgsConstructor
 public class OrderPayment extends BaseEntity{
 
-    @Column(name = "payment_mode", nullable = false)
+    @Column(name = "payment_mode")
     private Integer paymentMode;
 
     @Column(name = "is_completed", nullable = false)
