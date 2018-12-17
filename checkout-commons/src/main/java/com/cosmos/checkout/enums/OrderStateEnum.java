@@ -101,6 +101,7 @@ public enum OrderStateEnum {
         stateMovementList.put(ORDER_CREATED, new ArrayList<OrderStateEnum>() {
             {
                 add(ORDER_LOYALITY_APPLIED);
+                add(ORDER_PAYMENT_INITIATE);
             }
         });
 
