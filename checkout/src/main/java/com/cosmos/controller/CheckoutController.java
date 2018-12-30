@@ -1,8 +1,6 @@
 package com.cosmos.controller;
 
-import com.cosmos.checkout.dto.InitiateCheckoutRequest;
-import com.cosmos.checkout.dto.InitiateCheckoutResponse;
-import com.cosmos.checkout.dto.OrderLite;
+import com.cosmos.checkout.dto.*;
 import com.cosmos.service.IcheckoutService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,4 +35,17 @@ public class CheckoutController {
 
     }
 
+
+    /**
+     * Initiate payment checkout payment response dto.
+     *
+     * @param initiatePaymentRequestDto the initiate payment request dto
+     * @return the payment response dto
+     */
+    @RequestMapping(value = "/payment/initiate", method = RequestMethod.POST)
+    public PaymentResponseDto initiatePaymentCheckout(@RequestBody InitiatePaymentRequestDto initiatePaymentRequestDto) {
+        LOGGER.info("received Payment request for user :: {} for payment mode :: {}", initiatePaymentRequestDto.getUserCode(), initiatePaymentRequestDto.getPaymentModeId());
+        return checkoutService.initiatePayment(initiatePaymentRequestDto);
+
+    }
 }

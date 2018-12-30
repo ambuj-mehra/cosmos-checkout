@@ -5,6 +5,8 @@ import lombok.Getter;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -26,7 +28,7 @@ public enum PaymentMode {
      * The Mobikwik.
      */
     MOBIKWIK(1, "https://securegw-stage.paytm.in/theia/processTransaction",
-                  "mobikwik url", "gKpu7IKaLSbkchFS", "rxazcv89315285244163");
+            "mobikwik url", "gKpu7IKaLSbkchFS", "rxazcv89315285244163");
 
 
     private Integer paymentModeId;
@@ -40,7 +42,26 @@ public enum PaymentMode {
      */
     public static List<PaymentMode> paymentModes;
 
+    /**
+     * The Payment mode map.
+     */
+    public static Map<Integer, PaymentMode> paymentModeMap;
+
     static {
-        paymentModes = Arrays.stream(PaymentMode.values()).collect(Collectors.toList());
+        paymentModes = Arrays.stream(PaymentMode.values())
+                .collect(Collectors.toList());
+
+        paymentModeMap = Arrays.stream(PaymentMode.values())
+                .collect(Collectors.toMap(PaymentMode::getPaymentModeId, Function.identity()));
+    }
+
+    /**
+     * Gets payment mode by id.
+     *
+     * @param paymentModeId the payment mode id
+     * @return the payment mode by id
+     */
+    public static PaymentMode getPaymentModeById(Integer paymentModeId) {
+        return paymentModeMap.get(paymentModeId);
     }
 }

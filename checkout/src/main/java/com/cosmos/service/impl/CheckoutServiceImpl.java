@@ -3,7 +3,12 @@ package com.cosmos.service.impl;
 import com.cosmos.auth.bean.UserAuth;
 import com.cosmos.checkout.dto.InitiateCheckoutRequest;
 import com.cosmos.checkout.dto.InitiateCheckoutResponse;
+import com.cosmos.checkout.dto.InitiatePaymentRequestDto;
+import com.cosmos.checkout.dto.PaymentResponseDto;
+import com.cosmos.checkout.enums.OrderStateEnum;
 import com.cosmos.checkout.enums.PaymentMode;
+import com.cosmos.entity.OrderPayment;
+import com.cosmos.entity.OrderStateTransition;
 import com.cosmos.entity.Orders;
 import com.cosmos.exception.CheckoutException;
 import com.cosmos.repository.OrdersRepository;
@@ -16,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -34,6 +40,9 @@ public class CheckoutServiceImpl implements IcheckoutService {
     @Autowired
     private OrdersRepository ordersRepository;
 
+    @Autowired
+    private PaytmPaymentsService paytmPaymentsService;
+
     @Override
     @Transactional(rollbackOn = Exception.class)
     public InitiateCheckoutResponse initiateCheckout(InitiateCheckoutRequest initiateCheckoutRequest) {
@@ -48,6 +57,41 @@ public class CheckoutServiceImpl implements IcheckoutService {
                 .paymentOptions(Arrays.stream(PaymentMode.values())
                         .map(InitiateCheckoutResponse.PaymentOption::getFromPaymentMode)
                         .collect(Collectors.toList()))
+                .build();
+    }
+
+    @Override
+    @Transactional(rollbackOn = Exception.class)
+    public PaymentResponseDto initiatePayment(InitiatePaymentRequestDto initiatePaymentRequestDto) {
+        Orders orders = ordersRepository.findByTransactionId(initiatePaymentRequestDto.getTransactionId());
+        Optional.ofNullable(orders).orElseThrow(() -> new CheckoutException("Order not found"));
+        PaymentMode paymentMode = PaymentMode.getPaymentModeById(initiatePaymentRequestDto.getPaymentModeId());
+        PaymentResponseDto.PaymentOptionData paymentOptionData = null;
+        switch (paymentMode) {
+            case PAYTM:
+                 paymentOptionData = paytmPaymentsService.getPaymentsOptionData(initiatePaymentRequestDto);
+                 break;
+            default:
+                paymentOptionData = null;
+        }
+
+        OrderPayment orderPayment = orders.getOrderPayment();
+        orderPayment.setPaymentMode(initiatePaymentRequestDto.getPaymentModeId());
+        orders.setOrderPayment(orderPayment);
+
+        orders.setOrderStatus(OrderStateEnum.ORDER_PAYMENT_INITIATE.getOrderState());
+
+        OrderStateTransition orderStateTransition = new OrderStateTransition();
+        orderStateTransition.setOrderUpdateMessage("Payment initiated with Paytm");
+        orderStateTransition.setOrder(orders);
+        orderStateTransition.setOrderStatus(OrderStateEnum.ORDER_PAYMENT_INITIATE.getOrderState());
+        orders.getOrderStateTransitions().add(orderStateTransition);
+
+        ordersRepository.save(orders);
+        return PaymentResponseDto.builder()
+                .paymentOptionData(paymentOptionData)
+                .totalAmount(initiatePaymentRequestDto.getTotalOrderAmount().toString())
+                .transactionId(initiatePaymentRequestDto.getTransactionId())
                 .build();
     }
 }
