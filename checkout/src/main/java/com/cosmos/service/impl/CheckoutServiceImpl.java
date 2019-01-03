@@ -86,7 +86,7 @@ public class CheckoutServiceImpl implements IcheckoutService {
         orderStateTransition.setOrder(orders);
         orderStateTransition.setOrderStatus(OrderStateEnum.ORDER_PAYMENT_INITIATE.getOrderState());
         orders.getOrderStateTransitions().add(orderStateTransition);
-
+        //TODO :: use oms service for state change to prevent multiple hits
         ordersRepository.save(orders);
         return PaymentResponseDto.builder()
                 .paymentOptionData(paymentOptionData)
