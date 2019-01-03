@@ -19,13 +19,12 @@ public class PaytmPaymentsService implements IPaymentDetailsService {
             TreeMap<String, String> parameterMap = new TreeMap<>();
             parameterMap.put("MID", PaymentMode.PAYTM.getCosmosMerchantId());
             parameterMap.put("ORDER_ID", initiatePaymentRequestDto.getTransactionId());
-            parameterMap.put("CHANNEL_ID", "WAP");
+            parameterMap.put("CHANNEL_ID", "WEB");
             parameterMap.put("CUST_ID", initiatePaymentRequestDto.getUserCode());
             parameterMap.put("TXN_AMOUNT", initiatePaymentRequestDto.getTotalOrderAmount().toString());
-            parameterMap.put("WEBSITE", "APPSTAGING");
+            parameterMap.put("WEBSITE", "WEBSTAGING");
             parameterMap.put("INDUSTRY_TYPE_ID", "Retail");
-            parameterMap.put("MOBILE_NO", "8290747787");
-            parameterMap.put("CALLBACK_URL", "http://localhost:8085/paytm?ORDER_ID=" + initiatePaymentRequestDto.getTransactionId());
+            parameterMap.put("CALLBACK_URL", "https://securegw-stage.paytm.in/theia/paytmCallback?ORDER_ID=" + initiatePaymentRequestDto.getTransactionId());
             String paytmChecksum = CheckSumServiceHelper.getCheckSumServiceHelper().genrateCheckSum(PaymentMode.PAYTM.getPaymentModeSecretkey(), parameterMap);
             parameterMap.put("CHECKSUM", paytmChecksum);
             paymentOptionData = PaymentResponseDto.PaymentOptionData.builder()
