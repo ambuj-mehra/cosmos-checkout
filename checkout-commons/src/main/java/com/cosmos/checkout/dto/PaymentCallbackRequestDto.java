@@ -4,27 +4,22 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 
+import java.util.Map;
+
 /**
- * The type Oms response.
+ * The type Payment callback request dto.
  *
  * @author ambujmehra
  */
 @Getter
 @Setter
-@Builder
 @JsonInclude(value = JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-@NoArgsConstructor
 @AllArgsConstructor
-public class OmsResponse {
+@Builder
+public class PaymentCallbackRequestDto {
 
     private String userCode;
-    private String transactionId;
-    private Integer previousState;
-    private Integer currentState;
-    private String platformCode;
-    private String gameCode;
-    private String tournamentCode;
-
-
+    private Integer paymentModeId;
+    private Map<String, String> paymentResponseParams;
 }

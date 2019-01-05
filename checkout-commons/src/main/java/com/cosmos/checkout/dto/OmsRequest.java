@@ -2,9 +2,7 @@ package com.cosmos.checkout.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 /**
  * The type Oms request.
@@ -15,7 +13,8 @@ import lombok.Setter;
 @Setter
 @JsonInclude(value = JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class OmsRequest {
 
     private String userCode;

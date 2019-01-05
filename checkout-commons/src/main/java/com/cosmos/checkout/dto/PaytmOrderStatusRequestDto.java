@@ -2,29 +2,28 @@ package com.cosmos.checkout.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 /**
- * The type Oms response.
+ * The type Paytm order status request dto.
  *
  * @author ambujmehra
  */
 @Getter
 @Setter
-@Builder
 @JsonInclude(value = JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-@NoArgsConstructor
 @AllArgsConstructor
-public class OmsResponse {
+@Builder
+public class PaytmOrderStatusRequestDto {
 
-    private String userCode;
-    private String transactionId;
-    private Integer previousState;
-    private Integer currentState;
-    private String platformCode;
-    private String gameCode;
-    private String tournamentCode;
+    @JsonProperty("MID")
+    private String mid;
 
+    @JsonProperty("ORDERID")
+    private String orderId;
 
+    @JsonProperty("CHECKSUMHASH")
+    private String checksum;
 }

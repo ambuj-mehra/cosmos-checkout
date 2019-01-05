@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 
 /**
- * The type Oms response.
+ * The type Payment callback response dto.
  *
  * @author ambujmehra
  */
@@ -16,15 +16,13 @@ import lombok.*;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class OmsResponse {
+public class PaymentCallbackResponseDto {
 
-    private String userCode;
     private String transactionId;
-    private Integer previousState;
-    private Integer currentState;
+    private Double totalOrderAmount;
+    private Integer orderStatus;
+    private String userCode;
     private String platformCode;
     private String gameCode;
     private String tournamentCode;
-
-
 }
