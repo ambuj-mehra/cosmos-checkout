@@ -1,10 +1,7 @@
 package com.cosmos.service.impl;
 
 import com.cosmos.auth.bean.UserAuth;
-import com.cosmos.checkout.dto.InitiateCheckoutRequest;
-import com.cosmos.checkout.dto.InitiateCheckoutResponse;
-import com.cosmos.checkout.dto.InitiatePaymentRequestDto;
-import com.cosmos.checkout.dto.PaymentResponseDto;
+import com.cosmos.checkout.dto.*;
 import com.cosmos.checkout.enums.OrderStateEnum;
 import com.cosmos.checkout.enums.PaymentMode;
 import com.cosmos.entity.OrderPayment;
@@ -43,6 +40,9 @@ public class CheckoutServiceImpl implements IcheckoutService {
     @Autowired
     private PaytmPaymentsService paytmPaymentsService;
 
+    @Autowired
+    private OmsServiceImpl omsService;
+
     @Override
     @Transactional(rollbackOn = Exception.class)
     public InitiateCheckoutResponse initiateCheckout(InitiateCheckoutRequest initiateCheckoutRequest) {
@@ -74,24 +74,71 @@ public class CheckoutServiceImpl implements IcheckoutService {
             default:
                 paymentOptionData = null;
         }
-
         OrderPayment orderPayment = orders.getOrderPayment();
         orderPayment.setPaymentMode(initiatePaymentRequestDto.getPaymentModeId());
         orders.setOrderPayment(orderPayment);
 
-        orders.setOrderStatus(OrderStateEnum.ORDER_PAYMENT_INITIATE.getOrderState());
-
-        OrderStateTransition orderStateTransition = new OrderStateTransition();
-        orderStateTransition.setOrderUpdateMessage("Payment initiated with Paytm");
-        orderStateTransition.setOrder(orders);
-        orderStateTransition.setOrderStatus(OrderStateEnum.ORDER_PAYMENT_INITIATE.getOrderState());
-        orders.getOrderStateTransitions().add(orderStateTransition);
-        //TODO :: use oms service for state change to prevent multiple hits
+        OmsRequest omsRequest = OmsRequest.builder()
+                .orderStatus(OrderStateEnum.ORDER_PAYMENT_INITIATE.getOrderState())
+                .orderUpdateMessage("Payment initiated with" + paymentMode)
+                .transactionId(initiatePaymentRequestDto.getTransactionId())
+                .userCode(initiatePaymentRequestDto.getUserCode())
+                .build();
+        omsService.updateOrderStatus(omsRequest);
         ordersRepository.save(orders);
         return PaymentResponseDto.builder()
                 .paymentOptionData(paymentOptionData)
                 .totalAmount(initiatePaymentRequestDto.getTotalOrderAmount().toString())
                 .transactionId(initiatePaymentRequestDto.getTransactionId())
                 .build();
+    }
+
+    @Override
+    public PaymentCallbackResponseDto initiateCallbackPayment(PaymentCallbackRequestDto paymentCallbackRequestDto) {
+        PaymentMode paymentMode = PaymentMode.getPaymentModeById(paymentCallbackRequestDto.getPaymentModeId());
+        String cosmosTransactionId;
+        String paymentsModeTransactionId;
+        PaymentCallbackResponseDto paymentCallbackResponseDto = null;
+        switch (paymentMode) {
+            case PAYTM:
+                boolean paytmTransactionStatus = false;
+                paymentCallbackRequestDto.getPaymentResponseParams().remove("ORDER_ID");
+                cosmosTransactionId = paytmPaymentsService.getCosmosTransactionIdFromCallbackParams(paymentCallbackRequestDto.getPaymentResponseParams());
+                paymentsModeTransactionId = paytmPaymentsService.getPaymentModeTransactionId(paymentCallbackRequestDto.getPaymentResponseParams());
+                if (cosmosTransactionId != null && paymentsModeTransactionId != null) {
+                    paytmPaymentsService.validateCallbackChecksum(paymentCallbackRequestDto.getPaymentResponseParams());
+                    paytmTransactionStatus = paytmPaymentsService.checkOrderstatusFromPaymentMode(
+                            paymentCallbackRequestDto.getPaymentResponseParams());
+                } else {
+                    throw new CheckoutException("Could not get cosmos and payment mode transaction ids");
+                }
+                OmsRequest omsRequest = OmsRequest.builder()
+                        .orderUpdateMessage("Payment Response with" + paymentMode)
+                        .transactionId(paymentCallbackRequestDto.getPaymentResponseParams().get("ORDERID"))
+                        .build();
+
+                if (paytmTransactionStatus) {
+                    LOGGER.info("Received success response from paytm moving state to :: {}", OrderStateEnum.ORDER_PAYMENT_SUCCESS);
+                    omsRequest.setOrderStatus(OrderStateEnum.ORDER_PAYMENT_SUCCESS.getOrderState());
+                } else {
+                    LOGGER.info("Received failed response from paytm moving state to :: {}", OrderStateEnum.ORDER_CREDIT_FAILED);
+                    omsRequest.setOrderStatus(OrderStateEnum.ORDER_PAYMENT_FAILED.getOrderState());
+                }
+                OmsResponse omsResponse = omsService.updateOrderStatus(omsRequest);
+                paymentCallbackResponseDto = PaymentCallbackResponseDto.builder()
+                        .transactionId(omsResponse.getTransactionId())
+                        .orderStatus(omsResponse.getCurrentState())
+                        .totalOrderAmount(Double.valueOf(paymentCallbackRequestDto.getPaymentResponseParams().get("TXNAMOUNT")))
+                        .gameCode(omsResponse.getGameCode())
+                        .platformCode(omsResponse.getPlatformCode())
+                        .tournamentCode(omsResponse.getTournamentCode())
+                        .userCode(omsResponse.getUserCode())
+                        .build();
+
+                break;
+            default:
+        }
+
+        return paymentCallbackResponseDto;
     }
 }

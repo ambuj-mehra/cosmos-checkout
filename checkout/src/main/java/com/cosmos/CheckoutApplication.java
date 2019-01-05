@@ -2,6 +2,7 @@ package com.cosmos;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 
 /**
  * The type Checkout application.
@@ -9,6 +10,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @author ambujmehra
  */
 @SpringBootApplication
+@EnableFeignClients
 public class CheckoutApplication {
 
     /**

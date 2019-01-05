@@ -26,7 +26,7 @@ public class IntercepterConfig extends WebMvcConfigurerAdapter {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(authenticationInterceptor()).excludePathPatterns("/checkout/test/intercept");
+        registry.addInterceptor(authenticationInterceptor()).excludePathPatterns("/payment/paytm/callback");
     }
 
 

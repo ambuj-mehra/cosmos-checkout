@@ -3,6 +3,8 @@ package com.cosmos.utils;
 import com.cosmos.auth.entity.User;
 import com.cosmos.auth.repository.UserRepository;
 import com.cosmos.checkout.dto.InitiateCheckoutRequest;
+import com.cosmos.checkout.dto.PaytmOrderStatusRequestDto;
+import com.cosmos.checkout.dto.PaytmOrderStatusResponseDto;
 import com.cosmos.checkout.enums.OrderStateEnum;
 import com.cosmos.checkout.enums.PaymentMode;
 import com.cosmos.entity.OrderDiscount;
@@ -20,6 +22,7 @@ import org.apache.commons.codec.binary.Hex;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 
@@ -123,5 +126,21 @@ public class CheckoutUtils {
         LOGGER.info("transaction id generated for user :: {} and tournamanent :: {} is  :: {}",
                 initiateCheckoutRequest.getUserCode(), initiateCheckoutRequest.getTournamantCode(), transactionId);
         return transactionId;
+    }
+
+    /**
+     * Is paytm transaction success boolean.
+     *
+     * @param paymentsCallbackParams      the payments callback params
+     * @param paytmOrderStatusResponseDto the paytm order status response dto
+     * @return the boolean
+     */
+    public boolean isPaytmTransactionSuccess(Map<String, String> paymentsCallbackParams,
+                                             PaytmOrderStatusResponseDto paytmOrderStatusResponseDto) {
+        if (paymentsCallbackParams.get("STATUS").equals("TXN_SUCCESS") && paytmOrderStatusResponseDto.getStatus().equals("TXN_SUCCESS"))
+            return true;
+        else
+            return false;
+
     }
 }

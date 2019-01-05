@@ -1,10 +1,7 @@
 package com.cosmos.service;
 
 import com.cosmos.auth.bean.UserAuth;
-import com.cosmos.checkout.dto.InitiateCheckoutRequest;
-import com.cosmos.checkout.dto.InitiateCheckoutResponse;
-import com.cosmos.checkout.dto.InitiatePaymentRequestDto;
-import com.cosmos.checkout.dto.PaymentResponseDto;
+import com.cosmos.checkout.dto.*;
 
 /**
  * The interface Icheckout service.
@@ -29,4 +26,12 @@ public interface IcheckoutService {
      * @return the payment response dto
      */
     PaymentResponseDto initiatePayment(InitiatePaymentRequestDto initiatePaymentRequestDto);
+
+    /**
+     * Initiate callback payment payment callback response dto.
+     *
+     * @param paymentCallbackRequestDto the payment callback request dto
+     * @return the payment callback response dto
+     */
+    PaymentCallbackResponseDto initiateCallbackPayment(PaymentCallbackRequestDto paymentCallbackRequestDto);
 }
