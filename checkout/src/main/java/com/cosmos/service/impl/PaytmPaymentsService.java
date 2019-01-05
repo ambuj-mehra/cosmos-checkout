@@ -19,7 +19,7 @@ public class PaytmPaymentsService implements IPaymentDetailsService {
             TreeMap<String, String> parameterMap = new TreeMap<>();
             parameterMap.put("MID", PaymentMode.PAYTM.getCosmosMerchantId());
             parameterMap.put("ORDER_ID", initiatePaymentRequestDto.getTransactionId());
-            parameterMap.put("CHANNEL_ID", "WEB");
+            parameterMap.put("CHANNEL_ID", "WAP");
             parameterMap.put("CUST_ID", initiatePaymentRequestDto.getUserCode());
             parameterMap.put("TXN_AMOUNT", initiatePaymentRequestDto.getTotalOrderAmount().toString());
             parameterMap.put("WEBSITE", "WEBSTAGING");

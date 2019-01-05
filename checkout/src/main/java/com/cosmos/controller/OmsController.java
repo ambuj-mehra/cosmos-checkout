@@ -1,17 +1,11 @@
 package com.cosmos.controller;
 
-import com.cosmos.checkout.dto.InitiateCheckoutRequest;
-import com.cosmos.checkout.dto.InitiateCheckoutResponse;
-import com.cosmos.checkout.dto.OmsRequest;
-import com.cosmos.checkout.dto.OmsResponse;
+import com.cosmos.checkout.dto.*;
 import com.cosmos.service.IomsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * The type Oms controller.
@@ -38,6 +32,5 @@ public class OmsController {
         LOGGER.info("received request to update order :: {}, for user :: {}", omsRequest.getTransactionId(), omsRequest.getUserCode());
         return omsService.updateOrderStatus(omsRequest);
     }
-
 
 }
