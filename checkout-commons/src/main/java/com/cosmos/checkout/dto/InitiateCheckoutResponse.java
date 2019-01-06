@@ -25,6 +25,7 @@ public class InitiateCheckoutResponse {
     private String transactionId;
     private Double totalOrderAmount;
     private Integer orderStatus;
+    private String orderStateMessage;
     private Long orderDate;
     private Boolean PaymentStatus;
     private List<PaymentOption> paymentOptions;

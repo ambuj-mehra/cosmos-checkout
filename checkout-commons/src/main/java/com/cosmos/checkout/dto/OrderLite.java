@@ -26,5 +26,7 @@ public class OrderLite {
     private Double totalOrderAmount;
     private Double actualOrderAmount;
     private Integer paymentModeId;
+    private String userCode;
+    private Long orderDate;
 
 }
