@@ -29,7 +29,7 @@ public class StreamsTests {
     @Before
     public void createLedger() {
 
-        log.info("Streams are powerful java 8 features which use fok join pool to distribute tasks example of assembly line");
+        log.info("Streams are powerful java 8 features which use fok join pool(parallel streams) to distribute tasks example of assembly line");
         List<Ledger.Transaction> credits = Arrays.asList(
                 new Ledger.Transaction("CREDIT", BigDecimal.valueOf(500), LocalDate.now(), "Thor"),
                 new Ledger.Transaction("CREDIT", BigDecimal.valueOf(1000), LocalDate.now(), "Black Widow"),
@@ -71,9 +71,10 @@ public class StreamsTests {
         log.info("in case of 2 or more operations we can chain them one after other like a assembly line");
 
         log.info("map stage is user to transfrom 1 onbect to another and in next stage it become stram of transformed object");
-        tonyStarkLedger.getDebits().stream()
+        tonyStarkLedger.getDebits().parallelStream()
                 .sorted(Comparator.comparing(Ledger.Transaction::getAmount))
                 .map( transaction -> {
+                    log.info("Thread name :: {}", Thread.currentThread());
                     log.info("transaction of debit for  :: {} and amount  {}" , transaction.getTransactingPerson(), transaction.getAmount());
                     return transaction;
                 })
@@ -90,6 +91,12 @@ public class StreamsTests {
         log.info("show differ bigdecimal operations like max min and remove teh map stage for demo");
         log.info("hilk debits " + hulkMoney);
 
+
+    }
+
+
+    @Test
+    public void PerformancebenchMark() {
 
     }
 
