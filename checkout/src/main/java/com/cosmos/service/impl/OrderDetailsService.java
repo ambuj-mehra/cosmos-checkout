@@ -45,6 +45,8 @@ public class OrderDetailsService {
                 .totalOrderAmount(orders.getTotalOrderAmount())
                 .transactionId(transactionId)
                 .tournamentCode(orders.getTournamentCode())
+                .userCode(orders.getUserCode())
+                .orderDate(orders.getOrderDate().getTime())
                 .build();
     }
 
