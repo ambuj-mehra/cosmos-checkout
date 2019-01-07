@@ -1,11 +1,9 @@
 package com.cosmos.service.impl;
 
-import com.cosmos.auth.bean.UserAuth;
 import com.cosmos.checkout.dto.*;
 import com.cosmos.checkout.enums.OrderStateEnum;
 import com.cosmos.checkout.enums.PaymentMode;
 import com.cosmos.entity.OrderPayment;
-import com.cosmos.entity.OrderStateTransition;
 import com.cosmos.entity.Orders;
 import com.cosmos.exception.CheckoutException;
 import com.cosmos.repository.OrdersRepository;
