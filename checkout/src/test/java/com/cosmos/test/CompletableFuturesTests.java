@@ -64,7 +64,6 @@ public class CompletableFuturesTests {
      *
      * @throws Exception the exception
      */
-    @Test
     public void waitForFirstToFinish() throws Exception{
         Callable<String> taskJava = () -> mostRecentDataOnSearch("java");
         Callable<String> taskPython = () -> mostRecentDataOnSearch("pthon");

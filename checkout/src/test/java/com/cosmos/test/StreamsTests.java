@@ -6,10 +6,7 @@ import org.junit.Test;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -94,12 +91,6 @@ public class StreamsTests {
 
     }
 
-
-    @Test
-    public void PerformancebenchMark() {
-
-    }
-
     /**
      * Send money to zaak pay for debit of thor.
      */
@@ -112,5 +103,50 @@ public class StreamsTests {
         //show Orderstate enum for example also
 
     }
+
+
+    /**
+     * Performancebench mark with better for loop.
+     */
+    @Test
+    public void PerformancebenchMarkWithBetterForLoop() {
+
+        Long startTime = System.currentTimeMillis();
+        tonyStarkLedger.getDebits().stream()
+                .filter(transaction -> transaction.getTransactingPerson().equals("Hulk"))
+                .map(transaction -> Ledger.Transaction.getAmountForZaakPay(transaction.getAmount()))
+                .collect(Collectors.toList());
+
+        log.info("Stream Time :: {}", (System.currentTimeMillis() - startTime));
+        startTime = System.currentTimeMillis();
+
+        tonyStarkLedger.getDebits().parallelStream()
+                .filter(transaction -> transaction.getTransactingPerson().equals("Hulk"))
+                .map(transaction -> Ledger.Transaction.getAmountForZaakPay(transaction.getAmount()))
+                .collect(Collectors.toList());
+        log.info("Parallel Stream time :: {}", (System.currentTimeMillis() - startTime));
+
+        startTime = System.currentTimeMillis();
+        List<Ledger.Transaction> debits = tonyStarkLedger.getDebits();
+        List<Ledger.Transaction> hulkDebits = new ArrayList<>();
+        List<String> hulkZaakpayTransaction = new ArrayList<>();
+        for(Ledger.Transaction transaction : debits) {
+            if (transaction.getTransactingPerson().equals("Hulk")) {
+                hulkDebits.add(transaction);
+                hulkZaakpayTransaction.add(Ledger.Transaction.getAmountForZaakPay(transaction.getAmount()));
+            }
+
+        }
+        log.info("For loop  time :: {}", (System.currentTimeMillis() - startTime));
+    }
+
+   @Test
+    public void benchMark2() {
+        List<Integer> list = new ArrayList<>();
+        for (int i=0;i<1000000;i++) {
+            list.add(i);
+        }
+
+   }
 
 }
