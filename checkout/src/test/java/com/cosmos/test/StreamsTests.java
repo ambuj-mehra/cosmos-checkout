@@ -140,13 +140,5 @@ public class StreamsTests {
         log.info("For loop  time :: {}", (System.currentTimeMillis() - startTime));
     }
 
-   @Test
-    public void benchMark2() {
-        List<Integer> list = new ArrayList<>();
-        for (int i=0;i<1000000;i++) {
-            list.add(i);
-        }
-
-   }
 
 }
