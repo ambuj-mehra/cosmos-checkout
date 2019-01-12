@@ -45,7 +45,8 @@ public class CheckoutServiceImpl implements IcheckoutService {
     @Transactional(rollbackOn = Exception.class)
     public InitiateCheckoutResponse initiateCheckout(InitiateCheckoutRequest initiateCheckoutRequest) {
         Orders orders = ordersRepository.save(checkoutUtils.getOrdersFromCheckoutRequest(initiateCheckoutRequest));
-        LOGGER.info("order created in checkout Db for user :: {} with orderid :: {} and trnx id :: {}", initiateCheckoutRequest.getUserCode(), orders.getId(), orders.getTransactionId());
+        LOGGER.info("order created in checkout Db for user :: {} with orderid :: {} and trnx id :: {}",
+                initiateCheckoutRequest.getUserCode(), orders.getId(), orders.getTransactionId());
         return InitiateCheckoutResponse.builder()
         .orderDate(orders.getOrderDate().getTime())
                 .orderStatus(orders.getOrderStatus())
@@ -132,7 +133,6 @@ public class CheckoutServiceImpl implements IcheckoutService {
                         .tournamentCode(omsResponse.getTournamentCode())
                         .userCode(omsResponse.getUserCode())
                         .build();
-
                 break;
             default:
         }
