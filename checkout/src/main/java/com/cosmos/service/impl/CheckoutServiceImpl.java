@@ -102,8 +102,10 @@ public class CheckoutServiceImpl implements IcheckoutService {
             case PAYTM:
                 boolean paytmTransactionStatus = false;
                 paymentCallbackRequestDto.getPaymentResponseParams().remove("ORDER_ID");
-                cosmosTransactionId = paytmPaymentsService.getCosmosTransactionIdFromCallbackParams(paymentCallbackRequestDto.getPaymentResponseParams());
-                paymentsModeTransactionId = paytmPaymentsService.getPaymentModeTransactionId(paymentCallbackRequestDto.getPaymentResponseParams());
+                cosmosTransactionId = paytmPaymentsService.getCosmosTransactionIdFromCallbackParams(
+                        paymentCallbackRequestDto.getPaymentResponseParams());
+                paymentsModeTransactionId = paytmPaymentsService.getPaymentModeTransactionId(
+                        paymentCallbackRequestDto.getPaymentResponseParams());
                 if (cosmosTransactionId != null && paymentsModeTransactionId != null) {
                     paytmPaymentsService.validateCallbackChecksum(paymentCallbackRequestDto.getPaymentResponseParams());
                     paytmTransactionStatus = paytmPaymentsService.checkOrderstatusFromPaymentMode(
@@ -117,10 +119,12 @@ public class CheckoutServiceImpl implements IcheckoutService {
                         .build();
 
                 if (paytmTransactionStatus) {
-                    LOGGER.info("Received success response from paytm moving state to :: {}", OrderStateEnum.ORDER_PAYMENT_SUCCESS);
+                    LOGGER.info("Received success response from paytm moving state to :: {}",
+                            OrderStateEnum.ORDER_PAYMENT_SUCCESS);
                     omsRequest.setOrderStatus(OrderStateEnum.ORDER_PAYMENT_SUCCESS.getOrderState());
                 } else {
-                    LOGGER.info("Received failed response from paytm moving state to :: {}", OrderStateEnum.ORDER_CREDIT_FAILED);
+                    LOGGER.info("Received failed response from paytm moving state to :: {}",
+                            OrderStateEnum.ORDER_CREDIT_FAILED);
                     omsRequest.setOrderStatus(OrderStateEnum.ORDER_PAYMENT_FAILED.getOrderState());
                 }
                 OmsResponse omsResponse = omsService.updateOrderStatus(omsRequest);

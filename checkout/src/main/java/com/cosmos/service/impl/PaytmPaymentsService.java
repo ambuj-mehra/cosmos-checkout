@@ -41,8 +41,10 @@ public class PaytmPaymentsService implements IPaymentDetailsService {
             parameterMap.put("TXN_AMOUNT", initiatePaymentRequestDto.getTotalOrderAmount().toString());
             parameterMap.put("WEBSITE", "WEBSTAGING");
             parameterMap.put("INDUSTRY_TYPE_ID", "Retail");
-            parameterMap.put("CALLBACK_URL", "https://d3e6bf04.ngrok.io/payment/paytm/callback?ORDER_ID=" + initiatePaymentRequestDto.getTransactionId());
-            String paytmChecksum = CheckSumServiceHelper.getCheckSumServiceHelper().genrateCheckSum(PaymentMode.PAYTM.getPaymentModeSecretkey(), parameterMap);
+            parameterMap.put("CALLBACK_URL", "https://d3e6bf04.ngrok.io/payment/paytm/callback?ORDER_ID=" +
+                    initiatePaymentRequestDto.getTransactionId());
+            String paytmChecksum = CheckSumServiceHelper.getCheckSumServiceHelper().genrateCheckSum(
+                    PaymentMode.PAYTM.getPaymentModeSecretkey(), parameterMap);
             parameterMap.put("CHECKSUM", paytmChecksum);
             paymentOptionData = PaymentResponseDto.PaymentOptionData.builder()
                     .paymentModeId(initiatePaymentRequestDto.getPaymentModeId())
@@ -79,7 +81,8 @@ public class PaytmPaymentsService implements IPaymentDetailsService {
                 paytmParams.put(requestParamsEntry.getKey(), requestParamsEntry.getValue());
         }
         try {
-            isValidChecksum = CheckSumServiceHelper.getCheckSumServiceHelper().verifycheckSum(PaymentMode.PAYTM.getPaymentModeSecretkey(),
+            isValidChecksum = CheckSumServiceHelper.getCheckSumServiceHelper().verifycheckSum(
+                    PaymentMode.PAYTM.getPaymentModeSecretkey(),
                     paytmParams, paytmChecksum);
         } catch (Exception exception) {
             throw new CheckoutException("error in calculating checksum :: {}", exception);
@@ -94,14 +97,17 @@ public class PaytmPaymentsService implements IPaymentDetailsService {
         paytmParams.put("MID", PaymentMode.PAYTM.getCosmosMerchantId());
         paytmParams.put("ORDERID", paymentsCallbackParams.get("ORDERID"));
         try {
-            String paytmChecksum = CheckSumServiceHelper.getCheckSumServiceHelper().genrateCheckSum(PaymentMode.PAYTM.getPaymentModeSecretkey(), paytmParams);
+            String paytmChecksum = CheckSumServiceHelper.getCheckSumServiceHelper().genrateCheckSum(
+                    PaymentMode.PAYTM.getPaymentModeSecretkey(), paytmParams);
             PaytmOrderStatusRequestDto paytmOrderStatusRequestDto = PaytmOrderStatusRequestDto.builder()
                     .orderId(paymentsCallbackParams.get("ORDERID"))
                     .mid(PaymentMode.PAYTM.getCosmosMerchantId())
                     .checksum(paytmChecksum)
                     .build();
-            PaytmOrderStatusResponseDto paytmOrderStatusResponseDto = paytmClient.getPaytmTransactionStatus(paytmOrderStatusRequestDto);
-            LOGGER.info("received response from paytm for tranasaction status is :: {}", paytmOrderStatusResponseDto.toString());
+            PaytmOrderStatusResponseDto paytmOrderStatusResponseDto = paytmClient.getPaytmTransactionStatus(
+                    paytmOrderStatusRequestDto);
+            LOGGER.info("received response from paytm for tranasaction status is :: {}",
+                    paytmOrderStatusResponseDto.toString());
             return checkoutUtils.isPaytmTransactionSuccess(paymentsCallbackParams, paytmOrderStatusResponseDto);
         } catch (Exception exception) {
             LOGGER.error("exception in validating paytm callback :: {}", exception);

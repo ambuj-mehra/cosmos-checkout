@@ -49,7 +49,8 @@ public class OmsServiceImpl implements IomsService {
             orderStateTransition.setOrder(orders);
             orderStateTransition.setOrderStatus(updateStateRequest.getOrderState());
             orders.getOrderStateTransitions().add(orderStateTransition);
-            if (currentState.equals(OrderStateEnum.ORDER_PAYMENT_INITIATE) && updateStateRequest.equals(OrderStateEnum.ORDER_PAYMENT_SUCCESS)) {
+            if (currentState.equals(OrderStateEnum.ORDER_PAYMENT_INITIATE) && updateStateRequest.equals(
+                    OrderStateEnum.ORDER_PAYMENT_SUCCESS)) {
                 OrderPayment orderPayment = orders.getOrderPayment();
                 orderPayment.setCompleted(true);
                 orders.setOrderPayment(orderPayment);
@@ -65,7 +66,8 @@ public class OmsServiceImpl implements IomsService {
                     .tournamentCode(orders.getTournamentCode())
                     .build();
         } else {
-            throw new CheckoutException("invalid state movement detected for transactionid ::" + omsRequest.getTransactionId());
+            throw new CheckoutException("invalid state movement detected for transactionid ::" +
+                    omsRequest.getTransactionId());
         }
 
     }
