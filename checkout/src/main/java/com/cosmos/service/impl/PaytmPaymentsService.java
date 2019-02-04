@@ -41,7 +41,7 @@ public class PaytmPaymentsService implements IPaymentDetailsService {
             parameterMap.put("TXN_AMOUNT", initiatePaymentRequestDto.getTotalOrderAmount().toString());
             parameterMap.put("WEBSITE", "WEBSTAGING");
             parameterMap.put("INDUSTRY_TYPE_ID", "Retail");
-            parameterMap.put("CALLBACK_URL", "https://f3988a2e.ngrok.io/payment/paytm/callback?ORDER_ID=" +
+            parameterMap.put("CALLBACK_URL", "http://ad4e75bf.ngrok.io/payment/paytm/callback?ORDER_ID=" +
                     initiatePaymentRequestDto.getTransactionId());
             String paytmChecksum = CheckSumServiceHelper.getCheckSumServiceHelper().genrateCheckSum(
                     PaymentMode.PAYTM.getPaymentModeSecretkey(), parameterMap);

@@ -62,6 +62,7 @@ public class CheckoutServiceImpl implements IcheckoutService {
     @Override
     @Transactional(rollbackOn = Exception.class)
     public PaymentResponseDto initiatePayment(InitiatePaymentRequestDto initiatePaymentRequestDto) {
+
         Orders orders = ordersRepository.findByTransactionId(initiatePaymentRequestDto.getTransactionId());
         Optional.ofNullable(orders).orElseThrow(() -> new CheckoutException("Order not found"));
         PaymentMode paymentMode = PaymentMode.getPaymentModeById(initiatePaymentRequestDto.getPaymentModeId());
