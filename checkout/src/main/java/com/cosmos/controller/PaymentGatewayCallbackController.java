@@ -35,6 +35,9 @@ public class PaymentGatewayCallbackController {
     @RequestMapping(value = "/paytm/callback", method = RequestMethod.POST)
     public PaymentCallbackResponseDto paytmCallBack(@RequestBody PaymentCallbackRequestDto paymentCallbackRequestDto) {
         LOGGER.info("received response from paytm for params :: {}", paymentCallbackRequestDto.toString());
-        return checkoutService.initiateCallbackPayment(paymentCallbackRequestDto);
+        PaymentCallbackResponseDto paymentCallbackResponseDto = checkoutService
+                .initiateCallbackPayment(paymentCallbackRequestDto);
+        LOGGER.info("rresponse from payment callback:: {}", paymentCallbackResponseDto.toString());
+        return paymentCallbackResponseDto;
     }
 }

@@ -34,7 +34,9 @@ public class CheckoutController {
     @RequestMapping(value = "/initiate", method = RequestMethod.POST)
     public InitiateCheckoutResponse initiateCheckout(@RequestBody InitiateCheckoutRequest initiateCheckoutRequest) {
         LOGGER.info("received initiate checkout request :: {}", initiateCheckoutRequest.toString());
-        return checkoutService.initiateCheckout(initiateCheckoutRequest);
+        InitiateCheckoutResponse initiateCheckoutResponse = checkoutService.initiateCheckout(initiateCheckoutRequest);
+        LOGGER.info("initiate checkout response :: {}", initiateCheckoutResponse.toString());
+        return initiateCheckoutResponse;
 
     }
 
@@ -47,8 +49,10 @@ public class CheckoutController {
      */
     @RequestMapping(value = "/payment/initiate", method = RequestMethod.POST)
     public PaymentResponseDto initiatePaymentCheckout(@RequestBody InitiatePaymentRequestDto initiatePaymentRequestDto) {
-        LOGGER.info("received initiate Payment request for", initiatePaymentRequestDto.toString());
-        return checkoutService.initiatePayment(initiatePaymentRequestDto);
+        LOGGER.info("received initiate Payment request for:: {}", initiatePaymentRequestDto.toString());
+        PaymentResponseDto paymentResponseDto = checkoutService.initiatePayment(initiatePaymentRequestDto);
+        LOGGER.info("initiate Payment response :: {}", paymentResponseDto.toString());
+        return paymentResponseDto;
 
     }
 

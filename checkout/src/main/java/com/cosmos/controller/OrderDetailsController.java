@@ -33,8 +33,10 @@ public class OrderDetailsController {
      */
     @RequestMapping(value = "/{transactionId}", method = RequestMethod.GET)
     public OrderLite fetchOrderLite(@PathVariable(value = "transactionId") String transactionId) {
-        LOGGER.info("received response to fetch orderlite for transactionid  :: []", transactionId);
-        return orderDetailsService.fetchOrderLite(transactionId);
+        LOGGER.info("received response to fetch orderlite for transactionid  :: {}", transactionId);
+        OrderLite orderLite = orderDetailsService.fetchOrderLite(transactionId);
+        LOGGER.info("orderLite tem is ::{} ", orderLite.toString());
+        return orderLite;
     }
 
 }

@@ -29,10 +29,9 @@ public class ExceptionHandler {
 
 
     @org.springframework.web.bind.annotation.ExceptionHandler({Exception.class})
-    public ResponseEntity<CheckoutException> handleException(
-            CheckoutException coreException) {
-        log.error("Error in the service : {}", coreException);
-        return new ResponseEntity<>(coreException, HttpStatus.INTERNAL_SERVER_ERROR);
+    public ResponseEntity<Exception> handleException(Exception exception) {
+        log.error("Error in the service : {}", exception);
+        return new ResponseEntity<>(exception, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
 }

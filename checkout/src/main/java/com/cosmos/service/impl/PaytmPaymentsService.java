@@ -49,7 +49,6 @@ public class PaytmPaymentsService implements IPaymentDetailsService {
             paymentOptionData = PaymentResponseDto.PaymentOptionData.builder()
                     .paymentModeId(initiatePaymentRequestDto.getPaymentModeId())
                     .cosmosMerchantId(PaymentMode.PAYTM.getCosmosMerchantId())
-                    .cosmosSecretKey(PaymentMode.PAYTM.getPaymentModeSecretkey())
                     .postingUrl(PaymentMode.PAYTM.getPaymentUrl())
                     .parameterMap(parameterMap)
                     .build();

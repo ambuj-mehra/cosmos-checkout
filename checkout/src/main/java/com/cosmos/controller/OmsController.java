@@ -30,7 +30,9 @@ public class OmsController {
     @RequestMapping(value = "/updatestatus", method = RequestMethod.POST)
     public OmsResponse updateOrderStatus(@RequestBody OmsRequest omsRequest) {
         LOGGER.info("received request to update order :: {}", omsRequest.toString());
-        return omsService.updateOrderStatus(omsRequest);
+        OmsResponse omsResponse = omsService.updateOrderStatus(omsRequest);
+        LOGGER.info("OMS response is :: {}", omsResponse.toString());
+        return omsResponse;
     }
 
 }
