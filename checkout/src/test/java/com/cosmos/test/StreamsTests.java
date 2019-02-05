@@ -56,7 +56,7 @@ public class StreamsTests {
     @Test
     public void sortTonyDebitsBasedOnAmount() {
         log.info("Comparator is a functional interface!!");
-        Collections.sort(tonyStarkLedger.getCredits(), ((o1, o2) -> o1.getAmount().compareTo(o2.getAmount()))); //convert to inline
+        Collections.sort(tonyStarkLedger.getCredits(), (Comparator.comparing(Ledger.Transaction::getAmount))); //convert to inline
         log.info("updated ledger :: " + tonyStarkLedger.toString());
     }
 
@@ -68,7 +68,7 @@ public class StreamsTests {
         log.info("in case of 2 or more operations we can chain them one after other like a assembly line");
 
         log.info("map stage is user to transfrom 1 onbect to another and in next stage it become stram of transformed object");
-        tonyStarkLedger.getDebits().parallelStream()
+        tonyStarkLedger.getDebits().stream()
                 .sorted(Comparator.comparing(Ledger.Transaction::getAmount))
                 .map( transaction -> {
                     log.info("Thread name :: {}", Thread.currentThread());
@@ -84,7 +84,7 @@ public class StreamsTests {
         BigDecimal hulkMoney = tonyStarkLedger.getDebits().stream()
                 .filter(transaction -> transaction.getTransactingPerson().equals("Hulk"))   // list of trasactions
                 .map(Ledger.Transaction::getAmount)  // list of bigdecimals
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+                .reduce(BigDecimal.ONE, BigDecimal::multiply);
         log.info("show differ bigdecimal operations like max min and remove teh map stage for demo");
         log.info("hilk debits " + hulkMoney);
 
@@ -126,18 +126,6 @@ public class StreamsTests {
                 .collect(Collectors.toList());
         log.info("Parallel Stream time :: {}", (System.currentTimeMillis() - startTime));
 
-        startTime = System.currentTimeMillis();
-        List<Ledger.Transaction> debits = tonyStarkLedger.getDebits();
-        List<Ledger.Transaction> hulkDebits = new ArrayList<>();
-        List<String> hulkZaakpayTransaction = new ArrayList<>();
-        for(Ledger.Transaction transaction : debits) {
-            if (transaction.getTransactingPerson().equals("Hulk")) {
-                hulkDebits.add(transaction);
-                hulkZaakpayTransaction.add(Ledger.Transaction.getAmountForZaakPay(transaction.getAmount()));
-            }
-
-        }
-        log.info("For loop  time :: {}", (System.currentTimeMillis() - startTime));
     }
 
 

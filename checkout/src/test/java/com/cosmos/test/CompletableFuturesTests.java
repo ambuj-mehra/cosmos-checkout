@@ -103,6 +103,7 @@ public class CompletableFuturesTests {
         log.debug("This is from main thread asynch1");
         CompletableFuture<String> javaModified = java.thenApply(javaFuture -> {
             log.info("1st stage data is  :: " + javaFuture);
+            log.debug("Thread is :: {}", Thread.currentThread());
             return javaFuture + "Modifiction";
         });
         log.debug("This is from main thread asynch2");
@@ -144,7 +145,7 @@ public class CompletableFuturesTests {
 
         log.info("Ask what happens when we remove get from above??");
 
-        log.debug("Show API of eitherOf, allOF, eitherof, firstOf, anyOf etc");
+        log.debug("Show API of eitherOf, allOF, firstOf, anyOf etc");
     }
 
 
@@ -156,6 +157,12 @@ public class CompletableFuturesTests {
     @Test
     public void firstThreadOfTwoCompletes() throws Exception{
         // demo code
+        CompletableFuture<String> java = CompletableFuture.supplyAsync(() -> mostRecentDataOnSearch("java"));
+        CompletableFuture<String> scala = CompletableFuture.supplyAsync(() -> mostRecentDataOnSearch("scala"));
+        CompletableFuture<String> firstResult = java.applyToEither(scala , result -> result + " is first");
+        log.debug("Apply stages are async(nonblocking) always as evident here");
+
+        log.info("1st thread is :: " + firstResult.get());
 
     }
 
@@ -191,7 +198,8 @@ public class CompletableFuturesTests {
     public String mostRecentDataOnSearch(String text) {
         try {
             if(text.startsWith("j")) {
-                Thread.sleep(2000);
+                Thread.sleep(100);
+                throw new CheckoutException("Test");
             } else {
                 Thread.sleep(1000);
             }

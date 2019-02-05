@@ -2,6 +2,9 @@ package com.cosmos.test;
 
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
+
+import java.util.concurrent.Callable;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -65,7 +68,7 @@ public class LambdaTests {
             String mobikwikChecksum = "xyz";
             return mobikwikChecksum.equals(merchantChecksum);
         };
-        log.info("Checksum from merchant is valid? :: " + checksumValidator.test("xyz"));
+        log.info("Checksum from merchant is valid? :: " + checksumValidator.test("xabcyz"));
 
     }
 
@@ -76,6 +79,9 @@ public class LambdaTests {
     public void liveBiconsumerDemo() {
         log.info("Bi consumer is a interface that consumes 2 value and emist nothing");
         //Demo
+
+        BiConsumer<Integer, Integer> myConsumer = (a, b) -> log.info("Sum of integers is :: " + (a+b));
+        myConsumer.accept(1,2);
     }
 
 
@@ -109,8 +115,9 @@ public class LambdaTests {
             log.info("My sleeping Thread ends ");
         };
 
-        myThread.run();
-        myThreadWithSleep.run();
+        Thread myNew = new Thread(myThreadWithSleep);
+        myNew.run();
+        //myThreadWithSleep.run();
     }
 
     /**
@@ -120,5 +127,13 @@ public class LambdaTests {
     public void cllableTest() {
         log.info("Callables are great they let the thread return value, a FUTURe, this is a base of Completable future");
         //Demo
+
+        Callable<Integer> myCallable = "callable the new way"::length;
+        try {
+            log.info("my callable return" + myCallable.call());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 }
