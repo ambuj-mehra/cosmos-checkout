@@ -1,6 +1,7 @@
 package com.cosmos.entity;
 
 import com.cosmos.auth.entity.base.BaseEntity;
+import com.cosmos.checkout.enums.TransactionType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,14 +22,19 @@ import javax.persistence.*;
 @AllArgsConstructor
 public class OrderPayment extends BaseEntity{
 
-    @Column(name = "payment_mode")
-    private Integer paymentMode;
+    @Column(name = "payment_amount", nullable = false)
+    private Double totalOrderAmount;
+
 
     @Column(name = "is_completed", nullable = false)
     private boolean isCompleted;
 
-    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "order_id")
-    private Orders orders;
+    @Column(name = "transaction_type", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private TransactionType transactionType;
+
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "order_id", nullable = false)
+    private Orders order;
 
 }

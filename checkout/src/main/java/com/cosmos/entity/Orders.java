@@ -44,18 +44,22 @@ public class Orders extends BaseEntity{
     @Column(name = "order_status", nullable = false)
     private Integer orderStatus;
 
+    //total - discount (if any for order_discount table)
     @Column(name = "total_order_amount", nullable = false)
     private Double totalOrderAmount;
 
+    // debits - credits in order payments
     @Column(name = "actual_order_amount", nullable = false)
     private Double actualOrderAmount;
 
+    @Column(name = "payment_mode")
+    private Integer paymentMode;
 
     @OneToOne(mappedBy = "orders", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     private OrderDiscount orderDiscount;
 
-    @OneToOne(mappedBy = "orders", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
-    private OrderPayment orderPayment;
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrderPayment> orderPayments;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderStateTransition> orderStateTransitions;

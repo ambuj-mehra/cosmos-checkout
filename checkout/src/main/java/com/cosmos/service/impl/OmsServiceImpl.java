@@ -3,6 +3,7 @@ package com.cosmos.service.impl;
 import com.cosmos.checkout.dto.OmsRequest;
 import com.cosmos.checkout.dto.OmsResponse;
 import com.cosmos.checkout.enums.OrderStateEnum;
+import com.cosmos.checkout.enums.TransactionType;
 import com.cosmos.controller.OmsController;
 import com.cosmos.entity.OrderPayment;
 import com.cosmos.entity.OrderStateTransition;
@@ -16,7 +17,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 /**
  * The type Oms service.
@@ -51,9 +55,11 @@ public class OmsServiceImpl implements IomsService {
             orders.getOrderStateTransitions().add(orderStateTransition);
             if (currentState.equals(OrderStateEnum.ORDER_PAYMENT_INITIATE) && updateStateRequest.equals(
                     OrderStateEnum.ORDER_PAYMENT_SUCCESS)) {
-                OrderPayment orderPayment = orders.getOrderPayment();
+                List<OrderPayment> orderPayments = orders.getOrderPayments();
+                OrderPayment orderPayment = orderPayments.stream().filter(orderPayment1 -> orderPayment1.getTransactionType().equals(TransactionType.DEBIT))
+                        .collect(Collectors.toList()).get(0);
                 orderPayment.setCompleted(true);
-                orders.setOrderPayment(orderPayment);
+                orders.setOrderPayments(orderPayments);
             }
             ordersRepository.save(orders);
             return OmsResponse.builder()

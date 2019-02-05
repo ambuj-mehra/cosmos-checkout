@@ -40,7 +40,7 @@ public class OrderDetailsService {
                 .actualOrderAmount(orders.getActualOrderAmount())
                 .gameCode(orders.getGamecode())
                 .orderStatus(orders.getOrderStatus())
-                .paymentModeId(orders.getOrderPayment().getPaymentMode())
+                .paymentModeId(orders.getPaymentMode())
                 .platformCode(orders.getPlatformCode())
                 .totalOrderAmount(orders.getTotalOrderAmount())
                 .transactionId(transactionId)

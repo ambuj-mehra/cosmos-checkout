@@ -65,12 +65,6 @@ public class CheckoutUtils {
         orderDiscount.setOrders(orders);
         orderDiscount.setOrderDiscount(null);
 
-        OrderPayment orderPayment = new OrderPayment();
-        orderPayment.setCompleted(Boolean.FALSE);
-        orderPayment.setOrders(orders);
-        orderPayment.setPaymentMode(PaymentMode.PAYTM.getPaymentModeId());
-        //payment option will be updated in initiate payment API based on user choice
-
         OrderStateTransition orderStateTransition = new OrderStateTransition();
         orderStateTransition.setOrderStatus(OrderStateEnum.ORDER_CREATED.getOrderState());
         orderStateTransition.setOrderUpdateMessage("Order Initiated");
@@ -79,7 +73,6 @@ public class CheckoutUtils {
         List<OrderStateTransition> orderStateTransitions = new ArrayList<>();
         orderStateTransitions.add(orderStateTransition);
 
-        orders.setOrderPayment(orderPayment);
         orders.setOrderDiscount(orderDiscount);
         orders.setOrderStateTransitions(orderStateTransitions);
 

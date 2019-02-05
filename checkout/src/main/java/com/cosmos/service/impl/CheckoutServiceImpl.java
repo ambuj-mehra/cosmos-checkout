@@ -3,9 +3,11 @@ package com.cosmos.service.impl;
 import com.cosmos.checkout.dto.*;
 import com.cosmos.checkout.enums.OrderStateEnum;
 import com.cosmos.checkout.enums.PaymentMode;
+import com.cosmos.checkout.enums.TransactionType;
 import com.cosmos.entity.OrderPayment;
 import com.cosmos.entity.Orders;
 import com.cosmos.exception.CheckoutException;
+import com.cosmos.repository.OrderPaymentRepository;
 import com.cosmos.repository.OrdersRepository;
 import com.cosmos.service.IcheckoutService;
 import com.cosmos.utils.CheckoutUtils;
@@ -15,7 +17,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -36,6 +40,9 @@ public class CheckoutServiceImpl implements IcheckoutService {
     private OrdersRepository ordersRepository;
 
     @Autowired
+    private OrderPaymentRepository orderPaymentRepository;
+
+    @Autowired
     private PaytmPaymentsService paytmPaymentsService;
 
     @Autowired
@@ -50,7 +57,6 @@ public class CheckoutServiceImpl implements IcheckoutService {
         return InitiateCheckoutResponse.builder()
         .orderDate(orders.getOrderDate().getTime())
                 .orderStatus(orders.getOrderStatus())
-                .PaymentStatus(orders.getOrderPayment().isCompleted())
                 .totalOrderAmount(orders.getTotalOrderAmount())
                 .transactionId(orders.getTransactionId())
                 .paymentOptions(Arrays.stream(PaymentMode.values())
@@ -69,14 +75,18 @@ public class CheckoutServiceImpl implements IcheckoutService {
         PaymentResponseDto.PaymentOptionData paymentOptionData = null;
         switch (paymentMode) {
             case PAYTM:
+                orders.setPaymentMode(PaymentMode.PAYTM.getPaymentModeId());
                  paymentOptionData = paytmPaymentsService.getPaymentsOptionData(initiatePaymentRequestDto);
                  break;
             default:
                 paymentOptionData = null;
         }
-        OrderPayment orderPayment = orders.getOrderPayment();
-        orderPayment.setPaymentMode(initiatePaymentRequestDto.getPaymentModeId());
-        orders.setOrderPayment(orderPayment);
+        OrderPayment orderPayment = new OrderPayment();
+        orderPayment.setCompleted(false);
+        orderPayment.setOrder(orders);
+        orderPayment.setTotalOrderAmount(initiatePaymentRequestDto.getTotalOrderAmount());// this is final discount paytm amount
+        orderPayment.setTransactionType(TransactionType.DEBIT);
+        orderPaymentRepository.save(orderPayment);
 
         OmsRequest omsRequest = OmsRequest.builder()
                 .orderStatus(OrderStateEnum.ORDER_PAYMENT_INITIATE.getOrderState())
@@ -85,7 +95,6 @@ public class CheckoutServiceImpl implements IcheckoutService {
                 .userCode(initiatePaymentRequestDto.getUserCode())
                 .build();
         omsService.updateOrderStatus(omsRequest);
-        ordersRepository.save(orders);
         return PaymentResponseDto.builder()
                 .paymentOptionData(paymentOptionData)
                 .totalAmount(initiatePaymentRequestDto.getTotalOrderAmount().toString())
