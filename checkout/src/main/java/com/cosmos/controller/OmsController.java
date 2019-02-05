@@ -29,7 +29,7 @@ public class OmsController {
      */
     @RequestMapping(value = "/updatestatus", method = RequestMethod.POST)
     public OmsResponse updateOrderStatus(@RequestBody OmsRequest omsRequest) {
-        LOGGER.info("received request to update order :: {}, for user :: {}", omsRequest.getTransactionId(), omsRequest.getUserCode());
+        LOGGER.info("received request to update order :: {}", omsRequest.toString());
         return omsService.updateOrderStatus(omsRequest);
     }
 

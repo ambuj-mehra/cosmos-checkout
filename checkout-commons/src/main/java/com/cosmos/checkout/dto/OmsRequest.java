@@ -15,10 +15,12 @@ import lombok.*;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @AllArgsConstructor
 @Builder
+@ToString
 public class OmsRequest {
 
     private String userCode;
     private String transactionId;
     private Integer orderStatus;
     private String orderUpdateMessage;
+    private String paymentModeTransactionId;
 }

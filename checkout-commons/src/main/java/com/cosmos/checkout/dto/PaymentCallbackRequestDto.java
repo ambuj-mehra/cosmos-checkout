@@ -17,6 +17,7 @@ import java.util.Map;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @AllArgsConstructor
 @Builder
+@ToString
 public class PaymentCallbackRequestDto {
 
     private String userCode;

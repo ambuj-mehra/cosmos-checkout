@@ -25,6 +25,8 @@ public class OrderPayment extends BaseEntity{
     @Column(name = "payment_amount", nullable = false)
     private Double totalOrderAmount;
 
+    @Column(name = "payment_mode_transaction_id")
+    private String paymentModeTransactionId;
 
     @Column(name = "is_completed", nullable = false)
     private boolean isCompleted;

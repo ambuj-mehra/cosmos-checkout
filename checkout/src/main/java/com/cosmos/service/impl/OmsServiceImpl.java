@@ -53,11 +53,12 @@ public class OmsServiceImpl implements IomsService {
             orderStateTransition.setOrder(orders);
             orderStateTransition.setOrderStatus(updateStateRequest.getOrderState());
             orders.getOrderStateTransitions().add(orderStateTransition);
-            if (currentState.equals(OrderStateEnum.ORDER_PAYMENT_INITIATE) && updateStateRequest.equals(
-                    OrderStateEnum.ORDER_PAYMENT_SUCCESS)) {
+            if (currentState.equals(OrderStateEnum.ORDER_PAYMENT_INITIATE) && (updateStateRequest.equals(
+                    OrderStateEnum.ORDER_PAYMENT_SUCCESS) || updateStateRequest.equals(OrderStateEnum.ORDER_PAYMENT_FAILED))) {
                 List<OrderPayment> orderPayments = orders.getOrderPayments();
                 OrderPayment orderPayment = orderPayments.stream().filter(orderPayment1 -> orderPayment1.getTransactionType().equals(TransactionType.DEBIT))
                         .collect(Collectors.toList()).get(0);
+                orderPayment.setPaymentModeTransactionId(omsRequest.getPaymentModeTransactionId());
                 orderPayment.setCompleted(true);
                 orders.setOrderPayments(orderPayments);
             }

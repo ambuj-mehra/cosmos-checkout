@@ -126,6 +126,7 @@ public class CheckoutServiceImpl implements IcheckoutService {
                 OmsRequest omsRequest = OmsRequest.builder()
                         .orderUpdateMessage("Payment Response with" + paymentMode)
                         .transactionId(paymentCallbackRequestDto.getPaymentResponseParams().get("ORDERID"))
+                        .paymentModeTransactionId(paymentsModeTransactionId)
                         .build();
 
                 if (paytmTransactionStatus) {
@@ -134,7 +135,7 @@ public class CheckoutServiceImpl implements IcheckoutService {
                     omsRequest.setOrderStatus(OrderStateEnum.ORDER_PAYMENT_SUCCESS.getOrderState());
                 } else {
                     LOGGER.info("Received failed response from paytm moving state to :: {}",
-                            OrderStateEnum.ORDER_CREDIT_FAILED);
+                            OrderStateEnum.ORDER_PAYMENT_FAILED);
                     omsRequest.setOrderStatus(OrderStateEnum.ORDER_PAYMENT_FAILED.getOrderState());
                 }
                 OmsResponse omsResponse = omsService.updateOrderStatus(omsRequest);

@@ -40,6 +40,7 @@ CREATE TABLE `order_payments` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `order_id` bigint(20) NOT NULL,
   `payment_amount` double DEFAULT NULL,
+  `payment_mode_transaction_id`     VARCHAR(255)    DEFAULT  NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `transaction_type`     VARCHAR(32)     NOT NULL,
