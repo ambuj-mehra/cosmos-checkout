@@ -37,6 +37,5 @@ public class PaymentResponseDto {
         private String postingUrl;
         private Map<String, String> parameterMap;
         private String cosmosMerchantId;
-        private String cosmosSecretKey;
     }
 }

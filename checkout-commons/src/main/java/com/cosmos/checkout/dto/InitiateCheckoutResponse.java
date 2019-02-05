@@ -20,6 +20,7 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 public class InitiateCheckoutResponse {
 
     private String transactionId;

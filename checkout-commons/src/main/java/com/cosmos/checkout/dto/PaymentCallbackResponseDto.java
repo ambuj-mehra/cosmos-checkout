@@ -16,6 +16,7 @@ import lombok.*;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 public class PaymentCallbackResponseDto {
 
     private String transactionId;
