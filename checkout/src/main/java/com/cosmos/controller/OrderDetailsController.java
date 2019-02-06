@@ -1,14 +1,14 @@
 package com.cosmos.controller;
 
+import com.cosmos.checkout.dto.OrderHistoryResponseDto;
 import com.cosmos.checkout.dto.OrderLite;
 import com.cosmos.service.impl.OrderDetailsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * The type Order details controller.
@@ -38,5 +38,25 @@ public class OrderDetailsController {
         LOGGER.info("orderLite tem is ::{} ", orderLite.toString());
         return orderLite;
     }
+
+
+    /**
+     * Gets user history.
+     *
+     * @param userCode the user code
+     * @param page     the page
+     * @param size     the size
+     * @return the user history
+     */
+    @RequestMapping(value = "/{userCode}/history", method = RequestMethod.GET)
+    public List<OrderHistoryResponseDto> getUserHistory(@PathVariable(value = "userCode") String userCode,
+                                                        @RequestParam(value = "page") Integer page,
+                                                        @RequestParam(value = "size") Integer size) {
+        LOGGER.info("received request for  trnx history for :: {}, page :: {}, size :: {}", userCode, page, size);
+        List<OrderHistoryResponseDto> orderHistoryResponseDtos = orderDetailsService.getuserHistory(userCode, page, size);
+        LOGGER.info("response for order history :: {}", orderHistoryResponseDtos.toString());
+        return orderHistoryResponseDtos;
+    }
+
 
 }

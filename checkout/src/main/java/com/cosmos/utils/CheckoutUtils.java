@@ -3,14 +3,12 @@ package com.cosmos.utils;
 import com.cosmos.auth.entity.User;
 import com.cosmos.auth.repository.UserRepository;
 import com.cosmos.checkout.dto.InitiateCheckoutRequest;
+import com.cosmos.checkout.dto.OrderHistoryResponseDto;
 import com.cosmos.checkout.dto.PaytmOrderStatusRequestDto;
 import com.cosmos.checkout.dto.PaytmOrderStatusResponseDto;
 import com.cosmos.checkout.enums.OrderStateEnum;
 import com.cosmos.checkout.enums.PaymentMode;
-import com.cosmos.entity.OrderDiscount;
-import com.cosmos.entity.OrderPayment;
-import com.cosmos.entity.OrderStateTransition;
-import com.cosmos.entity.Orders;
+import com.cosmos.entity.*;
 import com.cosmos.exception.CheckoutException;
 import com.cosmos.service.impl.CheckoutServiceImpl;
 import org.slf4j.Logger;
@@ -135,5 +133,22 @@ public class CheckoutUtils {
         else
             return false;
 
+    }
+
+    /**
+     * Gets from transaction ledger.
+     *
+     * @param transactionLedger the transaction ledger
+     * @return the from transaction ledger
+     */
+    public OrderHistoryResponseDto getFromTransactionLedger(TransactionLedger transactionLedger) {
+        return OrderHistoryResponseDto.builder()
+                .paymentModeTransactionId(transactionLedger.getPaymentModeTransactionId())
+                .transactionDate(transactionLedger.getUpdatedAt().getTime())
+                .transactionId(transactionLedger.getTransactionId())
+                .transactionState(transactionLedger.getTransactionState())
+                .userCode(transactionLedger.getUserCode())
+                .type(transactionLedger.getType())
+                .build();
     }
 }
