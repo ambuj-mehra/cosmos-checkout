@@ -3,8 +3,8 @@ package com.cosmos.service.impl;
 import com.cosmos.checkout.dto.OmsRequest;
 import com.cosmos.checkout.dto.OmsResponse;
 import com.cosmos.checkout.enums.OrderStateEnum;
+import com.cosmos.checkout.enums.TransactionState;
 import com.cosmos.checkout.enums.TransactionType;
-import com.cosmos.controller.OmsController;
 import com.cosmos.entity.OrderPayment;
 import com.cosmos.entity.OrderStateTransition;
 import com.cosmos.entity.Orders;
@@ -15,11 +15,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 /**
@@ -35,8 +34,11 @@ public class OmsServiceImpl implements IomsService {
     @Autowired
     private OrdersRepository ordersRepository;
 
+    @Autowired
+    private TransactionLedgerServiceImpl transactionLedgerService;
+
     @Override
-    @Transactional(rollbackOn = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public OmsResponse updateOrderStatus(OmsRequest omsRequest) {
         Orders orders = ordersRepository.findByTransactionId(omsRequest.getTransactionId());
         Optional.ofNullable(orders).orElseThrow(() -> new CheckoutException("Order not found"));
@@ -56,10 +58,17 @@ public class OmsServiceImpl implements IomsService {
             if (currentState.equals(OrderStateEnum.ORDER_PAYMENT_INITIATE) && (updateStateRequest.equals(
                     OrderStateEnum.ORDER_PAYMENT_SUCCESS) || updateStateRequest.equals(OrderStateEnum.ORDER_PAYMENT_FAILED))) {
                 List<OrderPayment> orderPayments = orders.getOrderPayments();
-                OrderPayment orderPayment = orderPayments.stream().filter(orderPayment1 -> orderPayment1.getTransactionType().equals(TransactionType.DEBIT))
+                OrderPayment orderPayment = orderPayments.stream()
+                        .filter(orderPayment1 -> orderPayment1.getTransactionType().equals(TransactionType.DEBIT))
                         .collect(Collectors.toList()).get(0);
                 orderPayment.setPaymentModeTransactionId(omsRequest.getPaymentModeTransactionId());
-                orderPayment.setCompleted(true);
+
+                if (updateStateRequest.equals(OrderStateEnum.ORDER_PAYMENT_FAILED)) {
+                    transactionLedgerService.addTransactionLedger(omsRequest, TransactionType.DEBIT, TransactionState.FAILED);
+                } else if (updateStateRequest.equals(OrderStateEnum.ORDER_PAYMENT_SUCCESS)){
+                    orderPayment.setCompleted(true);
+                    transactionLedgerService.addTransactionLedger(omsRequest, TransactionType.DEBIT, TransactionState.SUCCESS);
+                }
                 orders.setOrderPayments(orderPayments);
             }
             ordersRepository.save(orders);

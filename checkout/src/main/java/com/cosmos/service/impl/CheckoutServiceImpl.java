@@ -15,11 +15,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -49,7 +47,7 @@ public class CheckoutServiceImpl implements IcheckoutService {
     private OmsServiceImpl omsService;
 
     @Override
-    @Transactional(rollbackOn = Exception.class)
+    @org.springframework.transaction.annotation.Transactional(rollbackFor = Exception.class)
     public InitiateCheckoutResponse initiateCheckout(InitiateCheckoutRequest initiateCheckoutRequest) {
         Orders orders = ordersRepository.save(checkoutUtils.getOrdersFromCheckoutRequest(initiateCheckoutRequest));
         LOGGER.info("order created in checkout Db for user :: {} with orderid :: {} and trnx id :: {}",
@@ -66,7 +64,7 @@ public class CheckoutServiceImpl implements IcheckoutService {
     }
 
     @Override
-    @Transactional(rollbackOn = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public PaymentResponseDto initiatePayment(InitiatePaymentRequestDto initiatePaymentRequestDto) {
 
         Orders orders = ordersRepository.findByTransactionId(initiatePaymentRequestDto.getTransactionId());
@@ -79,7 +77,7 @@ public class CheckoutServiceImpl implements IcheckoutService {
                  paymentOptionData = paytmPaymentsService.getPaymentsOptionData(initiatePaymentRequestDto);
                  break;
             default:
-                paymentOptionData = null;
+
         }
         OrderPayment orderPayment = new OrderPayment();
         orderPayment.setCompleted(false);
