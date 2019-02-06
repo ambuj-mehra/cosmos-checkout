@@ -41,7 +41,7 @@ public class PaytmPaymentsService implements IPaymentDetailsService {
             parameterMap.put("TXN_AMOUNT", initiatePaymentRequestDto.getTotalOrderAmount().toString());
             parameterMap.put("WEBSITE", "WEBSTAGING");
             parameterMap.put("INDUSTRY_TYPE_ID", "Retail");
-            parameterMap.put("CALLBACK_URL", "https://ad4e75bf.ngrok.io/payment/paytm/callback?ORDER_ID=" +
+            parameterMap.put("CALLBACK_URL", "https://f03513e2.ngrok.io/payment/paytm/callback?ORDER_ID=" +
                     initiatePaymentRequestDto.getTransactionId());
             String paytmChecksum = CheckSumServiceHelper.getCheckSumServiceHelper().genrateCheckSum(
                     PaymentMode.PAYTM.getPaymentModeSecretkey(), parameterMap);
@@ -66,6 +66,11 @@ public class PaytmPaymentsService implements IPaymentDetailsService {
     @Override
     public String getPaymentModeTransactionId(Map<String, String> paymentsCallbackParams) {
         return paymentsCallbackParams.get("TXNID");
+    }
+
+    @Override
+    public String getPaymentResponseMessage(Map<String, String> paymentsCallbackParams) {
+        return paymentsCallbackParams.get("RESPMSG");
     }
 
     @Override
@@ -114,8 +119,4 @@ public class PaytmPaymentsService implements IPaymentDetailsService {
         return false;
     }
 
-    @Override
-    public String getPaymentResponseMessage(Map<String, String> paymentsCallbackParams) {
-        return paymentsCallbackParams.get("RESPMSG");
-    }
 }
