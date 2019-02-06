@@ -78,6 +78,7 @@ CREATE TABLE `transaction_ledger` (
   `payment_mode_transaction_id` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `transaction_type` varchar(32) NOT NULL,
   `transaction_state` varchar(32) NOT NULL,
+  `transaction_message` text DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `is_active` bit(1) NOT NULL DEFAULT b'1',

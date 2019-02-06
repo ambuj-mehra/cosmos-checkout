@@ -41,6 +41,7 @@ public class TransactionLedgerServiceImpl {
         transactionLedger.setTransactionId(omsRequest.getTransactionId());
         transactionLedger.setTransactionState(transactionState);
         transactionLedger.setType(transactionType);
+        transactionLedger.setTransactionMessage(omsRequest.getOrderUpdateMessage());
         transactionLedger.setUserCode(omsRequest.getUserCode());
 
         transactionLedgerRepository.save(transactionLedger);

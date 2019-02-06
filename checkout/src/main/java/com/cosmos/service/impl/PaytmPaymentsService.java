@@ -113,4 +113,9 @@ public class PaytmPaymentsService implements IPaymentDetailsService {
         }
         return false;
     }
+
+    @Override
+    public String getPaymentResponseMessage(Map<String, String> paymentsCallbackParams) {
+        return paymentsCallbackParams.get("TXNID");
+    }
 }

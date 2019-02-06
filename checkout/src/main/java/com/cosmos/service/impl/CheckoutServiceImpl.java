@@ -122,7 +122,8 @@ public class CheckoutServiceImpl implements IcheckoutService {
                     throw new CheckoutException("Could not get cosmos and payment mode transaction ids");
                 }
                 OmsRequest omsRequest = OmsRequest.builder()
-                        .orderUpdateMessage("Payment Response with" + paymentMode)
+                        .orderUpdateMessage("Payment Response with " + paymentMode + "is " + paytmPaymentsService
+                                .getPaymentResponseMessage(paymentCallbackRequestDto.getPaymentResponseParams()))
                         .transactionId(paymentCallbackRequestDto.getPaymentResponseParams().get("ORDERID"))
                         .paymentModeTransactionId(paymentsModeTransactionId)
                         .build();

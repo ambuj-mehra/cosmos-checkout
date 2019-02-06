@@ -52,4 +52,13 @@ public interface IPaymentDetailsService {
      * @return the boolean
      */
     boolean checkOrderstatusFromPaymentMode(Map<String, String> paymentsCallbackParams);
+
+
+    /**
+     * Gets payment response message.
+     *
+     * @param paymentsCallbackParams the payments callback params
+     * @return the payment response message
+     */
+    String getPaymentResponseMessage(Map<String, String> paymentsCallbackParams);
 }

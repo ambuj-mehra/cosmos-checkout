@@ -29,5 +29,6 @@ public class OrderHistoryResponseDto {
     private TransactionType type;
     private TransactionState transactionState;
     private Long transactionDate;
+    private String transactionMessage;
 
 }

@@ -35,6 +35,9 @@ public class OrderPayment extends BaseEntity{
     @Enumerated(EnumType.STRING)
     private TransactionType transactionType;
 
+    @Column(name = "transaction_message")
+    private String transactionMessage;
+
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "order_id", nullable = false)
     private Orders order;

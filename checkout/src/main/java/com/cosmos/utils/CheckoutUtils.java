@@ -149,6 +149,7 @@ public class CheckoutUtils {
                 .transactionState(transactionLedger.getTransactionState())
                 .userCode(transactionLedger.getUserCode())
                 .type(transactionLedger.getType())
+                .transactionMessage(transactionLedger.getTransactionMessage())
                 .build();
     }
 }
