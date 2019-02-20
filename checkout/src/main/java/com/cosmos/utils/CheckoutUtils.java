@@ -150,6 +150,8 @@ public class CheckoutUtils {
                 .userCode(transactionLedger.getUserCode())
                 .type(transactionLedger.getType())
                 .transactionMessage(transactionLedger.getTransactionMessage())
+                .paymentMode(transactionLedger.getPaymentMode())
+                .transactionAmount(transactionLedger.getTransactionAmount())
                 .build();
     }
 }

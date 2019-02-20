@@ -35,6 +35,12 @@ public class TransactionLedger extends BaseEntity {
     @Column(name = "transaction_message")
     private String transactionMessage;
 
+    @Column(name = "transaction_amount")
+    private Double transactionAmount;
+
+    @Column(name = "payment_mode")
+    private Integer paymentMode;
+
     @Column(name = "transaction_type")
     @Enumerated(EnumType.STRING)
     private TransactionType type;

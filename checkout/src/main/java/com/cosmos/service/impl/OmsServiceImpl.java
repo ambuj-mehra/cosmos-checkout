@@ -64,10 +64,12 @@ public class OmsServiceImpl implements IomsService {
                 orderPayment.setPaymentModeTransactionId(omsRequest.getPaymentModeTransactionId());
                 orderPayment.setTransactionMessage(omsRequest.getOrderUpdateMessage());
                 if (updateStateRequest.equals(OrderStateEnum.ORDER_PAYMENT_FAILED)) {
-                    transactionLedgerService.addTransactionLedger(omsRequest, TransactionType.DEBIT, TransactionState.FAILED);
+                    transactionLedgerService.addTransactionLedger(omsRequest, TransactionType.DEBIT,
+                            TransactionState.FAILED, orders.getTotalOrderAmount());
                 } else if (updateStateRequest.equals(OrderStateEnum.ORDER_PAYMENT_SUCCESS)){
                     orderPayment.setCompleted(true);
-                    transactionLedgerService.addTransactionLedger(omsRequest, TransactionType.DEBIT, TransactionState.SUCCESS);
+                    transactionLedgerService.addTransactionLedger(omsRequest, TransactionType.DEBIT,
+                            TransactionState.SUCCESS, orders.getTotalOrderAmount());
                 }
                 orders.setOrderPayments(orderPayments);
             }

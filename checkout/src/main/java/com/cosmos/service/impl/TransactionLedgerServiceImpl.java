@@ -1,6 +1,7 @@
 package com.cosmos.service.impl;
 
 import com.cosmos.checkout.dto.OmsRequest;
+import com.cosmos.checkout.enums.PaymentMode;
 import com.cosmos.checkout.enums.TransactionState;
 import com.cosmos.checkout.enums.TransactionType;
 import com.cosmos.entity.TransactionLedger;
@@ -34,7 +35,7 @@ public class TransactionLedgerServiceImpl {
      */
     @Transactional(propagation= Propagation.REQUIRED)
     public void addTransactionLedger(OmsRequest omsRequest, TransactionType transactionType,
-                                     TransactionState transactionState) {
+                                     TransactionState transactionState, Double transactionAmount) {
 
         TransactionLedger transactionLedger = new TransactionLedger();
         transactionLedger.setPaymentModeTransactionId(omsRequest.getPaymentModeTransactionId());
@@ -43,7 +44,8 @@ public class TransactionLedgerServiceImpl {
         transactionLedger.setType(transactionType);
         transactionLedger.setTransactionMessage(omsRequest.getOrderUpdateMessage());
         transactionLedger.setUserCode(omsRequest.getUserCode());
-
+        transactionLedger.setPaymentMode(PaymentMode.PAYTM.getPaymentModeId());
+        transactionLedger.setTransactionAmount(transactionAmount);
         transactionLedgerRepository.save(transactionLedger);
 
     }

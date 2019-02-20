@@ -6,7 +6,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 
-import java.util.Date;
 
 /**
  * The type Order history response dto.
@@ -30,5 +29,7 @@ public class OrderHistoryResponseDto {
     private TransactionState transactionState;
     private Long transactionDate;
     private String transactionMessage;
+    private Integer paymentMode;
+    private Double transactionAmount;
 
 }
