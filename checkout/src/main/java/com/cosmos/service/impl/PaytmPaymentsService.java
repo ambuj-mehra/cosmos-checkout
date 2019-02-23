@@ -31,7 +31,7 @@ public class PaytmPaymentsService implements IPaymentDetailsService {
 
     @Override
     public PaymentResponseDto.PaymentOptionData getPaymentsOptionData(InitiatePaymentRequestDto initiatePaymentRequestDto) {
-        PaymentResponseDto.PaymentOptionData paymentOptionData = null;
+        PaymentResponseDto.PaymentOptionData paymentOptionData;
         try {
             TreeMap<String, String> parameterMap = new TreeMap<>();
             parameterMap.put("MID", PaymentMode.PAYTM.getCosmosMerchantId());

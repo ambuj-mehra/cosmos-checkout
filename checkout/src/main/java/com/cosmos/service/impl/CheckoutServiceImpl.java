@@ -108,7 +108,7 @@ public class CheckoutServiceImpl implements IcheckoutService {
         PaymentCallbackResponseDto paymentCallbackResponseDto = null;
         switch (paymentMode) {
             case PAYTM:
-                boolean paytmTransactionStatus = false;
+                boolean paytmTransactionStatus;
                 paymentCallbackRequestDto.getPaymentResponseParams().remove("ORDER_ID");
                 cosmosTransactionId = paytmPaymentsService.getCosmosTransactionIdFromCallbackParams(
                         paymentCallbackRequestDto.getPaymentResponseParams());
