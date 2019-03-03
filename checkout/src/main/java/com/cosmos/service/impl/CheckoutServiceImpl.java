@@ -51,7 +51,7 @@ public class CheckoutServiceImpl implements IcheckoutService {
     public InitiateCheckoutResponse initiateCheckout(InitiateCheckoutRequest initiateCheckoutRequest) {
         Orders orders = ordersRepository.save(checkoutUtils.getOrdersFromCheckoutRequest(initiateCheckoutRequest));
         LOGGER.info("order created in checkout Db for user :: {} with orderid :: {} and trnx id :: {}",
-                initiateCheckoutRequest.getUserCode(), orders.getId(), orders.getTransactionId());
+                initiateCheckoutRequest.getUserCode(), orders.getTransactionId(), orders.getTransactionId());
         return InitiateCheckoutResponse.builder()
         .orderDate(orders.getOrderDate().getTime())
                 .orderStatus(orders.getOrderStatus())
