@@ -1,7 +1,7 @@
 package com.cosmos.service.impl;
 
-import com.cosmos.checkout.dto.OrderHistoryResponseDto;
-import com.cosmos.checkout.dto.OrderLite;
+import com.cosmos.checkout.dto.*;
+import com.cosmos.checkout.enums.OrderStateEnum;
 import com.cosmos.controller.OrderDetailsController;
 import com.cosmos.entity.Orders;
 import com.cosmos.entity.TransactionLedger;
@@ -16,6 +16,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -40,6 +41,9 @@ public class OrderDetailsService {
     @Autowired
     private CheckoutUtils checkoutUtils;
 
+    @Autowired
+    private OmsServiceImpl omsService;
+
     /**
      * Fetch order lite order lite.
      *
@@ -63,6 +67,29 @@ public class OrderDetailsService {
                 .userCode(orders.getUserCode())
                 .orderDate(orders.getOrderDate().getTime())
                 .build();
+    }
+
+
+    /**
+     * Update order from tournament code and user code oms response.
+     *
+     * @param rankingOrderUpdateRequestDto the ranking order update request dto
+     * @return the oms response
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public OmsResponse updateOrderFromTournamentCodeAndUserCode(RankingOrderUpdateRequestDto rankingOrderUpdateRequestDto) {
+        Orders orders = ordersRepository.findByTournamentCodeAndUserCode(rankingOrderUpdateRequestDto.getTournamentCode(),
+                rankingOrderUpdateRequestDto.getUserCode());
+        Optional.ofNullable(orders).orElseThrow(() -> new CheckoutException("Order not found"));
+        LOGGER.info("Fetched order successfully for transaction is :: {}", orders.getTransactionId());
+        OmsRequest omsRequest = OmsRequest.builder()
+                .orderStatus(OrderStateEnum.ORDER_SUCCESS.getOrderState())
+                .orderUpdateMessage("Prize Money Credited")
+                .transactionId(orders.getTransactionId())
+                .userCode(orders.getUserCode())
+                .payoutAmount(rankingOrderUpdateRequestDto.getPayoutAmount())
+                .build();
+        return omsService.updateOrderStatus(omsRequest);
     }
 
 

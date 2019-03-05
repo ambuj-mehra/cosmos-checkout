@@ -57,16 +57,6 @@ public enum OrderStateEnum {
     ORDER_TOURNAMNET_JOINED(7, "tournamnt joined, poll data", Boolean.FALSE),
 
     /**
-     * The Order tournament start.
-     */
-    ORDER_TOURNAMENT_START(8, "Data update pre tournamnt", Boolean.FALSE),
-
-    /**
-     * The Order tournament end.
-     */
-    ORDER_TOURNAMENT_END(9, "Data update post tournamnt", Boolean.FALSE),
-
-    /**
      * The Order prize processed.
      */
     ORDER_PRIZE_PROCESSED(10, "prize calculation completed", Boolean.FALSE),
@@ -137,19 +127,7 @@ public enum OrderStateEnum {
 
         stateMovementList.put(ORDER_TOURNAMNET_JOINED, new ArrayList<OrderStateEnum>() {
             {
-                add(ORDER_TOURNAMENT_START);
-            }
-        });
-
-        stateMovementList.put(ORDER_TOURNAMENT_START, new ArrayList<OrderStateEnum>() {
-            {
-                add(ORDER_TOURNAMENT_END);
-                add(ORDER_FAILED);
-            }
-        });
-
-        stateMovementList.put(ORDER_TOURNAMENT_END, new ArrayList<OrderStateEnum>() {
-            {
+                add(ORDER_SUCCESS);
                 add(ORDER_PRIZE_PROCESSED);
                 add(ORDER_FAILED);
             }

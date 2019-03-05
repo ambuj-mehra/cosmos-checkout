@@ -2,10 +2,13 @@ package com.cosmos.checkout.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 /**
- * The type Oms request.
+ * The type Ranking order update request dto.
  *
  * @author ambujmehra
  */
@@ -13,15 +16,11 @@ import lombok.*;
 @Setter
 @JsonInclude(value = JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-@AllArgsConstructor
-@Builder
+@NoArgsConstructor
 @ToString
-public class OmsRequest {
+public class RankingOrderUpdateRequestDto {
 
+    private String tournamentCode;
     private String userCode;
-    private String transactionId;
-    private Integer orderStatus;
-    private String orderUpdateMessage;
-    private String paymentModeTransactionId;
     private double payoutAmount;
 }

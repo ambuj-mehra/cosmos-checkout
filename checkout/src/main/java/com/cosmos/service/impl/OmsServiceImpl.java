@@ -73,6 +73,19 @@ public class OmsServiceImpl implements IomsService {
                 }
                 orders.setOrderPayments(orderPayments);
             }
+            if (updateStateRequest.equals(OrderStateEnum.ORDER_SUCCESS)) {
+                List<OrderPayment> orderPayments = orders.getOrderPayments();
+                OrderPayment orderPayment = new OrderPayment();
+                orderPayment.setCompleted(true);
+                orderPayment.setOrder(orders);
+                orderPayment.setTotalOrderAmount(omsRequest.getPayoutAmount());
+                orderPayment.setTransactionType(TransactionType.CREDIT);
+                orderPayments.add(orderPayment);
+                orders.setOrderPayments(orderPayments);
+                transactionLedgerService.addTransactionLedger(omsRequest, TransactionType.CREDIT,
+                        TransactionState.SUCCESS, omsRequest.getPayoutAmount());
+
+            }
             ordersRepository.save(orders);
             return OmsResponse.builder()
                     .currentState(updateStateRequest.getOrderState())

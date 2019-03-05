@@ -1,7 +1,9 @@
 package com.cosmos.controller;
 
+import com.cosmos.checkout.dto.OmsResponse;
 import com.cosmos.checkout.dto.OrderHistoryResponseDto;
 import com.cosmos.checkout.dto.OrderLite;
+import com.cosmos.checkout.dto.RankingOrderUpdateRequestDto;
 import com.cosmos.service.impl.OrderDetailsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +41,19 @@ public class OrderDetailsController {
         return orderLite;
     }
 
+
+    /**
+     * Fetch order lite from tournament and user code oms response.
+     *
+     * @param rankingOrderUpdateRequestDto the ranking order update request dto
+     * @return the oms response
+     */
+    @RequestMapping(value = "/ranking/update", method = RequestMethod.PUT)
+    public OmsResponse fetchOrderLiteFromTournamentAndUserCode(@RequestBody RankingOrderUpdateRequestDto rankingOrderUpdateRequestDto) {
+        LOGGER.info("received response to fetch orderlite for tournamentCode  :: {} and userCode :: {}",
+                rankingOrderUpdateRequestDto.getTournamentCode(), rankingOrderUpdateRequestDto.getUserCode());
+        return orderDetailsService.updateOrderFromTournamentCodeAndUserCode(rankingOrderUpdateRequestDto);
+    }
 
     /**
      * Gets user history.

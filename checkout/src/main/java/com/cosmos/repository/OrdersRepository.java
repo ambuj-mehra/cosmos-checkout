@@ -10,5 +10,20 @@ import org.springframework.data.repository.CrudRepository;
  */
 public interface OrdersRepository extends CrudRepository<Orders, Long> {
 
+    /**
+     * Find by transaction id orders.
+     *
+     * @param transactionId the transaction id
+     * @return the orders
+     */
     Orders findByTransactionId(String transactionId);
+
+    /**
+     * Find by tournament code and user code orders.
+     *
+     * @param tournamentCode the tournament code
+     * @param userCode       the user code
+     * @return the orders
+     */
+    Orders findByTournamentCodeAndUserCode(String tournamentCode, String userCode);
 }
