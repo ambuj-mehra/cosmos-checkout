@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -46,11 +47,11 @@ public class Orders extends BaseEntity{
 
     //total - discount (if any for order_discount table)
     @Column(name = "total_order_amount", nullable = false)
-    private Double totalOrderAmount;
+    private BigDecimal totalOrderAmount;
 
     // debits - credits in order payments
     @Column(name = "actual_order_amount", nullable = false)
-    private Double actualOrderAmount;
+    private BigDecimal actualOrderAmount;
 
     @Column(name = "payment_mode")
     private Integer paymentMode;

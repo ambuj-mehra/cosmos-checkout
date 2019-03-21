@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 
+import java.math.BigDecimal;
+
 /**
  * The type Payment callback response dto.
  *
@@ -20,7 +22,7 @@ import lombok.*;
 public class PaymentCallbackResponseDto {
 
     private String transactionId;
-    private Double totalOrderAmount;
+    private BigDecimal totalOrderAmount;
     private Integer orderStatus;
     private String userCode;
     private String platformCode;

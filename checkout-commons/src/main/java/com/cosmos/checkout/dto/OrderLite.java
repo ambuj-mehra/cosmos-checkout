@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 
+import java.math.BigDecimal;
+
 /**
  * The type Order lite.
  *
@@ -24,8 +26,8 @@ public class OrderLite {
     private String platformCode;
     private String tournamentCode;
     private Integer orderStatus;
-    private Double totalOrderAmount;
-    private Double actualOrderAmount;
+    private BigDecimal totalOrderAmount;
+    private BigDecimal actualOrderAmount;
     private Integer paymentModeId;
     private String userCode;
     private Long orderDate;

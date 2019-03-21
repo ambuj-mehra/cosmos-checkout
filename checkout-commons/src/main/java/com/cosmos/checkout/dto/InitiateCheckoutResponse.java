@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.sun.org.apache.xpath.internal.operations.Bool;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -24,7 +25,7 @@ import java.util.List;
 public class InitiateCheckoutResponse {
 
     private String transactionId;
-    private Double totalOrderAmount;
+    private BigDecimal totalOrderAmount;
     private Integer orderStatus;
     private String orderStateMessage;
     private Long orderDate;

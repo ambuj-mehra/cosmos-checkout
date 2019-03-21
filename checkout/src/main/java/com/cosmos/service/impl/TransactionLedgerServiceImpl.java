@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+
 /**
  * The type Transaction ledger service.
  *
@@ -35,7 +37,7 @@ public class TransactionLedgerServiceImpl {
      */
     @Transactional(propagation= Propagation.REQUIRED)
     public void addTransactionLedger(OmsRequest omsRequest, TransactionType transactionType,
-                                     TransactionState transactionState, Double transactionAmount) {
+                                     TransactionState transactionState, BigDecimal transactionAmount) {
 
         TransactionLedger transactionLedger = new TransactionLedger();
         transactionLedger.setPaymentModeTransactionId(omsRequest.getPaymentModeTransactionId());

@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 
 /**
  * The type Order discount.
@@ -23,7 +24,7 @@ import javax.persistence.*;
 public class OrderDiscount extends BaseEntity{
 
     @Column(name = "order_discount")
-    private Double orderDiscount;
+    private BigDecimal orderDiscount;
 
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "order_id")

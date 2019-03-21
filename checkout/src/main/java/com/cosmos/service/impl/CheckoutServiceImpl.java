@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -141,7 +142,8 @@ public class CheckoutServiceImpl implements IcheckoutService {
                 paymentCallbackResponseDto = PaymentCallbackResponseDto.builder()
                         .transactionId(omsResponse.getTransactionId())
                         .orderStatus(omsResponse.getCurrentState())
-                        .totalOrderAmount(Double.valueOf(paymentCallbackRequestDto.getPaymentResponseParams().get("TXNAMOUNT")))
+                        .totalOrderAmount(BigDecimal.valueOf(Double.valueOf(paymentCallbackRequestDto
+                                .getPaymentResponseParams().get("TXNAMOUNT"))))
                         .gameCode(omsResponse.getGameCode())
                         .platformCode(omsResponse.getPlatformCode())
                         .tournamentCode(omsResponse.getTournamentCode())

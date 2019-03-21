@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.math.BigDecimal;
+
 /**
  * The type Initiate checkout request.
  *
@@ -24,6 +26,6 @@ public class InitiateCheckoutRequest {
     private String platformCode;
     private String userCode;
     private String tournamantCode;
-    private Double totalOrderAmount;
+    private BigDecimal totalOrderAmount;
 
 }

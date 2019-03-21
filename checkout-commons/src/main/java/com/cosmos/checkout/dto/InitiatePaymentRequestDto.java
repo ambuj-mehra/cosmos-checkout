@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.math.BigDecimal;
+
 /**
  * The type Initiate payment request dto.
  *
@@ -21,7 +23,7 @@ import lombok.ToString;
 public class InitiatePaymentRequestDto {
 
     private String transactionId;
-    private Double totalOrderAmount;
+    private BigDecimal totalOrderAmount;
     private Integer paymentModeId;
     private String userCode;
 }

@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 
 /**
  * The type Order payment.
@@ -23,7 +24,7 @@ import javax.persistence.*;
 public class OrderPayment extends BaseEntity{
 
     @Column(name = "payment_amount", nullable = false)
-    private Double totalOrderAmount;
+    private BigDecimal totalOrderAmount;
 
     @Column(name = "payment_mode_transaction_id")
     private String paymentModeTransactionId;

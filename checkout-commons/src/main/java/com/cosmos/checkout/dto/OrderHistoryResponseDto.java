@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 
+import java.math.BigDecimal;
+
 
 /**
  * The type Order history response dto.
@@ -30,6 +32,6 @@ public class OrderHistoryResponseDto {
     private Long transactionDate;
     private String transactionMessage;
     private Integer paymentMode;
-    private Double transactionAmount;
+    private BigDecimal transactionAmount;
 
 }

@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.math.BigDecimal;
+
 /**
  * The type Ranking order update request dto.
  *
@@ -22,5 +24,5 @@ public class RankingOrderUpdateRequestDto {
 
     private String tournamentCode;
     private String userCode;
-    private double payoutAmount;
+    private BigDecimal payoutAmount;
 }

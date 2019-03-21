@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 
 /**
  * The type Transaction ledger.
@@ -36,7 +37,7 @@ public class TransactionLedger extends BaseEntity {
     private String transactionMessage;
 
     @Column(name = "transaction_amount")
-    private Double transactionAmount;
+    private BigDecimal transactionAmount;
 
     @Column(name = "payment_mode")
     private Integer paymentMode;

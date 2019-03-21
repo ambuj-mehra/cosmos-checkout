@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 
+import java.math.BigDecimal;
+
 /**
  * The type Oms request.
  *
@@ -23,5 +25,5 @@ public class OmsRequest {
     private Integer orderStatus;
     private String orderUpdateMessage;
     private String paymentModeTransactionId;
-    private double payoutAmount;
+    private BigDecimal payoutAmount;
 }
