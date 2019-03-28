@@ -22,12 +22,12 @@ public enum PaymentMode {
      * The Paytm payment mode
      */
     PAYTM(0, "https://securegw.paytm.in/theia/processTransaction",
-            "paytmlogo url", "Ulp073L5YOkT04k8", "XfZSBI32379297858859"),
+            "paytmlogo url", "7KiP62X1#IO2HwEJ", "SpeHqH11050895314462"),
 
     /**
      * The Mobikwik.
      */
-    MOBIKWIK(1, "https://securegw-stage.paytm.in/theia/processTransaction",
+    MOBIKWIK(1, "https://securegw.paytm.in/theia/processTransaction",
             "mobikwik url", "gKpu7IKaLSbkchFS", "rxazcv89315285244163");
 
 
