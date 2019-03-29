@@ -18,6 +18,7 @@ import java.util.Map;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 public class PaymentResponseDto {
 
     private String transactionId;
@@ -32,6 +33,7 @@ public class PaymentResponseDto {
     @JsonIgnoreProperties(ignoreUnknown = true)
     @NoArgsConstructor
     @AllArgsConstructor
+    @ToString
     public static class PaymentOptionData {
         private Integer paymentModeId;
         private String postingUrl;
