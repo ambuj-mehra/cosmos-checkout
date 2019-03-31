@@ -3,6 +3,7 @@ package com.cosmos.service.impl;
 import com.cosmos.checkout.dto.OmsRequest;
 import com.cosmos.checkout.dto.OmsResponse;
 import com.cosmos.checkout.enums.OrderStateEnum;
+import com.cosmos.checkout.enums.PaymentMode;
 import com.cosmos.checkout.enums.TransactionState;
 import com.cosmos.checkout.enums.TransactionType;
 import com.cosmos.entity.OrderPayment;
@@ -65,11 +66,11 @@ public class OmsServiceImpl implements IomsService {
                 orderPayment.setTransactionMessage(omsRequest.getOrderUpdateMessage());
                 if (updateStateRequest.equals(OrderStateEnum.ORDER_PAYMENT_FAILED)) {
                     transactionLedgerService.addTransactionLedger(omsRequest, TransactionType.DEBIT,
-                            TransactionState.FAILED, orders.getTotalOrderAmount());
+                            TransactionState.FAILED, orders.getTotalOrderAmount(), PaymentMode.PAYTM);
                 } else if (updateStateRequest.equals(OrderStateEnum.ORDER_PAYMENT_SUCCESS)){
                     orderPayment.setCompleted(true);
                     transactionLedgerService.addTransactionLedger(omsRequest, TransactionType.DEBIT,
-                            TransactionState.SUCCESS, orders.getTotalOrderAmount());
+                            TransactionState.SUCCESS, orders.getTotalOrderAmount(), PaymentMode.PAYTM);
                 }
                 orders.setOrderPayments(orderPayments);
             }
@@ -83,7 +84,7 @@ public class OmsServiceImpl implements IomsService {
                 orderPayments.add(orderPayment);
                 orders.setOrderPayments(orderPayments);
                 transactionLedgerService.addTransactionLedger(omsRequest, TransactionType.CREDIT,
-                        TransactionState.SUCCESS, omsRequest.getPayoutAmount());
+                        TransactionState.SUCCESS, omsRequest.getPayoutAmount(), PaymentMode.PAYTM);
 
             }
             ordersRepository.save(orders);
