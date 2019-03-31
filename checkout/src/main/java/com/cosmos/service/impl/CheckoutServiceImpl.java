@@ -6,9 +6,11 @@ import com.cosmos.checkout.enums.PaymentMode;
 import com.cosmos.checkout.enums.TransactionType;
 import com.cosmos.entity.OrderPayment;
 import com.cosmos.entity.Orders;
+import com.cosmos.entity.UserCosmosCash;
 import com.cosmos.exception.CheckoutException;
 import com.cosmos.repository.OrderPaymentRepository;
 import com.cosmos.repository.OrdersRepository;
+import com.cosmos.service.ICosmosCashService;
 import com.cosmos.service.IcheckoutService;
 import com.cosmos.utils.CheckoutUtils;
 import org.slf4j.Logger;
@@ -47,16 +49,35 @@ public class CheckoutServiceImpl implements IcheckoutService {
     @Autowired
     private OmsServiceImpl omsService;
 
+    @Autowired
+    private ICosmosCashService cosmosCashService;
+
+
     @Override
     @org.springframework.transaction.annotation.Transactional(rollbackFor = Exception.class)
     public InitiateCheckoutResponse initiateCheckout(InitiateCheckoutRequest initiateCheckoutRequest) {
-        Orders orders = ordersRepository.save(checkoutUtils.getOrdersFromCheckoutRequest(initiateCheckoutRequest));
+        Orders checkoutOrder = checkoutUtils.getOrdersFromCheckoutRequest(initiateCheckoutRequest);
+        UserCosmosCash userCosmosCash = cosmosCashService.getUserCosmosCashBalance(initiateCheckoutRequest.getUserCode());
+
+        if (checkoutOrder.getTotalOrderAmount().compareTo(userCosmosCash.getCosmosCash()) <= 0) {
+            LOGGER.info("User :: {} has cosmos cash more thean total amount", initiateCheckoutRequest.getUserCode());
+            checkoutOrder.setActualOrderAmount(BigDecimal.ZERO);
+            checkoutOrder.setCosmosCash(checkoutOrder.getTotalOrderAmount());
+        } else {
+            LOGGER.info("User :: {} has to do balance payment as cash is less", initiateCheckoutRequest.getUserCode());
+            checkoutOrder.setCosmosCash(userCosmosCash.getCosmosCash());
+            checkoutOrder.setActualOrderAmount(checkoutOrder.getTotalOrderAmount().subtract(userCosmosCash.getCosmosCash()));
+        }
+        Orders orders = ordersRepository.save(checkoutOrder);
         LOGGER.info("order created in checkout Db for user :: {} with orderid :: {} and trnx id :: {}",
                 initiateCheckoutRequest.getUserCode(), orders.getTransactionId(), orders.getTransactionId());
         return InitiateCheckoutResponse.builder()
-        .orderDate(orders.getOrderDate().getTime())
+                .orderDate(orders.getOrderDate().getTime())
                 .orderStatus(orders.getOrderStatus())
                 .totalOrderAmount(orders.getTotalOrderAmount())
+                .actualOrderAmount(orders.getActualOrderAmount())
+                .usableCosmosCash(orders.getCosmosCash())
+                .totalCosmosCash(userCosmosCash.getCosmosCash())
                 .transactionId(orders.getTransactionId())
                 .paymentOptions(Arrays.stream(PaymentMode.values())
                         .map(InitiateCheckoutResponse.PaymentOption::getFromPaymentMode)
