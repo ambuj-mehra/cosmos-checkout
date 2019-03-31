@@ -59,5 +59,19 @@ public class CosmosCashServiceImpl implements ICosmosCashService {
         return userCosmosCashRepository.save(userCosmosCash);
     }
 
+    @Override
+    public UserCosmosCash createCosmosWalletForUser(String userCode, BigDecimal initialCosmosBalance) {
+        LOGGER.info("Create cosmos balance wallet for user :: {} with initial amount :: {}", userCode, initialCosmosBalance);
+        UserCosmosCash currentUserCosmosCash = userCosmosCashRepository.findByUserCode(userCode);
+        if (currentUserCosmosCash != null) {
+            LOGGER.info("Wallet already created for user :: {}", userCode);
+            return currentUserCosmosCash;
+        } else {
+            UserCosmosCash userCosmosCash = new UserCosmosCash();
+            userCosmosCash.setCosmosCash(initialCosmosBalance);
+            userCosmosCash.setUserCode(userCode);
+            return userCosmosCashRepository.save(userCosmosCash);
+        }
+    }
 
 }

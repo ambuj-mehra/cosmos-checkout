@@ -37,4 +37,13 @@ public interface ICosmosCashService {
      */
     UserCosmosCash debitCosmosCash(String userCode, BigDecimal cosmosCash);
 
+    /**
+     * Create cosmos wallet for user user cosmos cash.
+     *
+     * @param userCode             the user code
+     * @param initialCosmosBalance the initial cosmos balance
+     * @return the user cosmos cash
+     */
+    UserCosmosCash createCosmosWalletForUser(String userCode, BigDecimal initialCosmosBalance);
+
 }
