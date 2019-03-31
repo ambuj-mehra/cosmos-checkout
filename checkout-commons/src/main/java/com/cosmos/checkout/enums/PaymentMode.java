@@ -27,8 +27,7 @@ public enum PaymentMode {
     /**
      * The Mobikwik.
      */
-    MOBIKWIK(1, "https://securegw.paytm.in/theia/processTransaction",
-            "mobikwik url", "gKpu7IKaLSbkchFS", "rxazcv89315285244163");
+    COSMOS_CASH(1, null, "cosmos cash url", null, null);
 
 
     private Integer paymentModeId;
