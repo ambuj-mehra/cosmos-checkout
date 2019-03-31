@@ -26,4 +26,14 @@ public interface OrdersRepository extends CrudRepository<Orders, Long> {
      * @return the orders
      */
     Orders findByTournamentCodeAndUserCode(String tournamentCode, String userCode);
+
+    /**
+     * Find by tournament code and user code and order status orders.
+     *
+     * @param tournamentCode the tournament code
+     * @param userCode       the user code
+     * @param orderStatus    the order status
+     * @return the orders
+     */
+    Orders findByTournamentCodeAndUserCodeAndOrderStatus(String tournamentCode, String userCode, Integer orderStatus);
 }

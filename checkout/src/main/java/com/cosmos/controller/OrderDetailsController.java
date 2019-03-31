@@ -48,6 +48,7 @@ public class OrderDetailsController {
      * @param rankingOrderUpdateRequestDto the ranking order update request dto
      * @return the oms response
      */
+    @Deprecated
     @RequestMapping(value = "/ranking/update", method = RequestMethod.PUT)
     public OmsResponse fetchOrderLiteFromTournamentAndUserCode(@RequestBody RankingOrderUpdateRequestDto rankingOrderUpdateRequestDto) {
         LOGGER.info("received response to fetch orderlite for tournamentCode  :: {} and userCode :: {}",
