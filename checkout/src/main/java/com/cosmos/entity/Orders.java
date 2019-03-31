@@ -45,13 +45,16 @@ public class Orders extends BaseEntity{
     @Column(name = "order_status", nullable = false)
     private Integer orderStatus;
 
-    //total - discount (if any for order_discount table)
+    //total order amount
     @Column(name = "total_order_amount", nullable = false)
     private BigDecimal totalOrderAmount;
 
-    // debits - credits in order payments
+    // totalOrderAmount - credits or discount in order_discount table in order payments
     @Column(name = "actual_order_amount", nullable = false)
     private BigDecimal actualOrderAmount;
+
+    @Column(name = "cosmos_cash", nullable = false)
+    private BigDecimal cosmosCash;
 
     @Column(name = "payment_mode")
     private Integer paymentMode;
