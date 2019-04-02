@@ -57,7 +57,7 @@ public class CheckoutServiceImpl implements IcheckoutService {
     @org.springframework.transaction.annotation.Transactional(rollbackFor = Exception.class)
     public InitiateCheckoutResponse initiateCheckout(InitiateCheckoutRequest initiateCheckoutRequest) {
         Orders checkoutOrder = checkoutUtils.getOrdersFromCheckoutRequest(initiateCheckoutRequest);
-        UserCosmosCash userCosmosCash = cosmosCashService.getUserCosmosCashBalance(initiateCheckoutRequest.getUserCode());
+        CosmosCashDto userCosmosCash = cosmosCashService.getUserCosmosCashBalance(initiateCheckoutRequest.getUserCode());
 
         if (checkoutOrder.getTotalOrderAmount().compareTo(userCosmosCash.getCosmosCash()) <= 0) {
             LOGGER.info("User :: {} has cosmos cash more thean total amount", initiateCheckoutRequest.getUserCode());

@@ -1,5 +1,6 @@
 package com.cosmos.service.impl;
 
+import com.cosmos.checkout.dto.CosmosCashDto;
 import com.cosmos.entity.UserCosmosCash;
 import com.cosmos.exception.CheckoutException;
 import com.cosmos.repository.UserCosmosCashRepository;
@@ -29,48 +30,66 @@ public class CosmosCashServiceImpl implements ICosmosCashService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public UserCosmosCash getUserCosmosCashBalance(String userCode) {
+    public CosmosCashDto getUserCosmosCashBalance(String userCode) {
         LOGGER.info("Getting cosmos balance for user :: {}", userCode);
         UserCosmosCash userCosmosCash = userCosmosCashRepository.findByUserCode(userCode);
         Optional.ofNullable(userCosmosCash).orElseThrow(() -> new CheckoutException("Cosmos cash not found"));
         LOGGER.info("Cosmos cash available for user ::{} is  :: {}", userCode, userCosmosCash.getCosmosCash());
-        return userCosmosCash;
+        return CosmosCashDto.builder()
+                .cosmosCash(userCosmosCash.getCosmosCash())
+                .userCode(userCosmosCash.getUserCode())
+                .build();
     }
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
-    public UserCosmosCash creditCosmosCash(String userCode, BigDecimal creditCosmosCash) {
+    public CosmosCashDto creditCosmosCash(String userCode, BigDecimal creditCosmosCash) {
         LOGGER.info("Credit cosmos balance for user :: {} with amount :: {}", userCode, creditCosmosCash);
         UserCosmosCash userCosmosCash = userCosmosCashRepository.findByUserCode(userCode);
         Optional.ofNullable(userCosmosCash).orElseThrow(() -> new CheckoutException("Cosmos cash not found"));
         BigDecimal updatedCosmosCash = userCosmosCash.getCosmosCash().add(creditCosmosCash);
         userCosmosCash.setCosmosCash(updatedCosmosCash);
-        return userCosmosCashRepository.save(userCosmosCash);
+        userCosmosCash =  userCosmosCashRepository.save(userCosmosCash);
+        return CosmosCashDto.builder()
+                .cosmosCash(userCosmosCash.getCosmosCash())
+                .userCode(userCosmosCash.getUserCode())
+                .build();
     }
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
-    public UserCosmosCash debitCosmosCash(String userCode, BigDecimal debitCosmosCash) {
+    public CosmosCashDto debitCosmosCash(String userCode, BigDecimal debitCosmosCash) {
         LOGGER.info("Credit cosmos balance for user :: {} with amount :: {}", userCode, debitCosmosCash);
         UserCosmosCash userCosmosCash = userCosmosCashRepository.findByUserCode(userCode);
         Optional.ofNullable(userCosmosCash).orElseThrow(() -> new CheckoutException("Cosmos cash not found"));
         BigDecimal updatedCosmosCash = userCosmosCash.getCosmosCash().subtract(debitCosmosCash);
         userCosmosCash.setCosmosCash(updatedCosmosCash);
-        return userCosmosCashRepository.save(userCosmosCash);
+        userCosmosCash = userCosmosCashRepository.save(userCosmosCash);
+        return CosmosCashDto.builder()
+                .cosmosCash(userCosmosCash.getCosmosCash())
+                .userCode(userCosmosCash.getUserCode())
+                .build();
     }
 
     @Override
-    public UserCosmosCash createCosmosWalletForUser(String userCode, BigDecimal initialCosmosBalance) {
+    public CosmosCashDto createCosmosWalletForUser(String userCode, BigDecimal initialCosmosBalance) {
         LOGGER.info("Create cosmos balance wallet for user :: {} with initial amount :: {}", userCode, initialCosmosBalance);
         UserCosmosCash currentUserCosmosCash = userCosmosCashRepository.findByUserCode(userCode);
         if (currentUserCosmosCash != null) {
             LOGGER.info("Wallet already created for user :: {}", userCode);
-            return currentUserCosmosCash;
+            return CosmosCashDto.builder()
+                    .cosmosCash(currentUserCosmosCash.getCosmosCash())
+                    .userCode(currentUserCosmosCash.getUserCode())
+                    .build();
         } else {
             UserCosmosCash userCosmosCash = new UserCosmosCash();
             userCosmosCash.setCosmosCash(initialCosmosBalance);
             userCosmosCash.setUserCode(userCode);
-            return userCosmosCashRepository.save(userCosmosCash);
+            userCosmosCash = userCosmosCashRepository.save(userCosmosCash);
+            return CosmosCashDto.builder()
+                    .cosmosCash(userCosmosCash.getCosmosCash())
+                    .userCode(userCosmosCash.getUserCode())
+                    .build();
         }
     }
 

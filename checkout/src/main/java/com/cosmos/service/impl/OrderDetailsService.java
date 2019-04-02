@@ -62,6 +62,7 @@ public class OrderDetailsService {
                 .paymentModeId(orders.getPaymentMode())
                 .platformCode(orders.getPlatformCode())
                 .totalOrderAmount(orders.getTotalOrderAmount())
+                .cosmosCash(orders.getCosmosCash())
                 .transactionId(transactionId)
                 .tournamentCode(orders.getTournamentCode())
                 .userCode(orders.getUserCode())

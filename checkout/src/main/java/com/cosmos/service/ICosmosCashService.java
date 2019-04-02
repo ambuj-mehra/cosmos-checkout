@@ -1,6 +1,6 @@
 package com.cosmos.service;
 
-import com.cosmos.entity.UserCosmosCash;
+import com.cosmos.checkout.dto.CosmosCashDto;
 
 import java.math.BigDecimal;
 
@@ -17,7 +17,7 @@ public interface ICosmosCashService {
      * @param userCode the user code
      * @return the user cosmos cash balance
      */
-    UserCosmosCash getUserCosmosCashBalance(String userCode);
+    CosmosCashDto getUserCosmosCashBalance(String userCode);
 
     /**
      * Credit cosmos cash user cosmos cash.
@@ -26,7 +26,7 @@ public interface ICosmosCashService {
      * @param cosmosCash the cosmos cash
      * @return the user cosmos cash
      */
-    UserCosmosCash creditCosmosCash(String userCode, BigDecimal cosmosCash);
+    CosmosCashDto creditCosmosCash(String userCode, BigDecimal cosmosCash);
 
     /**
      * Debit cosmos cash user cosmos cash.
@@ -35,7 +35,7 @@ public interface ICosmosCashService {
      * @param cosmosCash the cosmos cash
      * @return the user cosmos cash
      */
-    UserCosmosCash debitCosmosCash(String userCode, BigDecimal cosmosCash);
+    CosmosCashDto debitCosmosCash(String userCode, BigDecimal cosmosCash);
 
     /**
      * Create cosmos wallet for user user cosmos cash.
@@ -44,6 +44,6 @@ public interface ICosmosCashService {
      * @param initialCosmosBalance the initial cosmos balance
      * @return the user cosmos cash
      */
-    UserCosmosCash createCosmosWalletForUser(String userCode, BigDecimal initialCosmosBalance);
+    CosmosCashDto createCosmosWalletForUser(String userCode, BigDecimal initialCosmosBalance);
 
 }
