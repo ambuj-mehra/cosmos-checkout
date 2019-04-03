@@ -102,7 +102,7 @@ public class CheckoutServiceImpl implements IcheckoutService {
                     OrderPayment orderPayment = new OrderPayment();
                     orderPayment.setCompleted(false);
                     orderPayment.setOrder(orders);
-                    orderPayment.setTotalOrderAmount(initiatePaymentRequestDto.getActualOrderAmount());// this is final discount paytm amount
+                    orderPayment.setTotalOrderAmount(initiatePaymentRequestDto.getActualOrderAmount());
                     orderPayment.setTransactionType(TransactionType.DEBIT);
                     orderPayment.setPaymentMode(PaymentMode.PAYTM);
                     orderPaymentRepository.save(orderPayment);
@@ -115,7 +115,7 @@ public class CheckoutServiceImpl implements IcheckoutService {
             OrderPayment orderPayment = new OrderPayment();
             orderPayment.setCompleted(false);
             orderPayment.setOrder(orders);
-            orderPayment.setTotalOrderAmount(initiatePaymentRequestDto.getActualOrderAmount());// this is final discount paytm amount
+            orderPayment.setTotalOrderAmount(initiatePaymentRequestDto.getCosmosCashUsed());
             orderPayment.setTransactionType(TransactionType.DEBIT);
             orderPayment.setPaymentMode(PaymentMode.COSMOS_CASH);
             orderPaymentRepository.save(orderPayment);
