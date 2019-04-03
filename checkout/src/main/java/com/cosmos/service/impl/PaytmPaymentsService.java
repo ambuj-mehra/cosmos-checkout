@@ -38,7 +38,7 @@ public class PaytmPaymentsService implements IPaymentDetailsService {
             parameterMap.put("ORDER_ID", initiatePaymentRequestDto.getTransactionId());
             parameterMap.put("CHANNEL_ID", "WAP");
             parameterMap.put("CUST_ID", initiatePaymentRequestDto.getUserCode());
-            parameterMap.put("TXN_AMOUNT", initiatePaymentRequestDto.getTotalOrderAmount().toString());
+            parameterMap.put("TXN_AMOUNT", initiatePaymentRequestDto.getActualOrderAmount().toString());
             parameterMap.put("WEBSITE", "DEFAULT");
             parameterMap.put("INDUSTRY_TYPE_ID", "Retail");
             parameterMap.put("CALLBACK_URL", "https://app.tryhard.gg/payment/paytm/callback?ORDER_ID=" +

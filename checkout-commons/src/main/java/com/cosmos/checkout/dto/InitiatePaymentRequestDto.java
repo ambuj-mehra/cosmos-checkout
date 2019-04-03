@@ -24,6 +24,8 @@ public class InitiatePaymentRequestDto {
 
     private String transactionId;
     private BigDecimal totalOrderAmount;
-    private Integer paymentModeId;
+    private BigDecimal actualOrderAmount;
+    private BigDecimal cosmosCashUsed;
+    private Integer paymentModeId; //  external payment mode
     private String userCode;
 }

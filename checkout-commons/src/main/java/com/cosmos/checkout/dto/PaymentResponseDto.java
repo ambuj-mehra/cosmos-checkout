@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.util.Map;
 
 /**
@@ -22,7 +23,9 @@ import java.util.Map;
 public class PaymentResponseDto {
 
     private String transactionId;
-    private String totalAmount;
+    private BigDecimal totalOrderAmount;
+    private BigDecimal actualOrderAmount;
+    private BigDecimal cosmosCash;
     private PaymentOptionData paymentOptionData;
 
 

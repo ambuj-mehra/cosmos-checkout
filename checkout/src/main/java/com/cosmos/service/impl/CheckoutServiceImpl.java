@@ -91,33 +91,49 @@ public class CheckoutServiceImpl implements IcheckoutService {
 
         Orders orders = ordersRepository.findByTransactionId(initiatePaymentRequestDto.getTransactionId());
         Optional.ofNullable(orders).orElseThrow(() -> new CheckoutException("Order not found"));
-        PaymentMode paymentMode = PaymentMode.getPaymentModeById(initiatePaymentRequestDto.getPaymentModeId());
         PaymentResponseDto.PaymentOptionData paymentOptionData = null;
-        switch (paymentMode) {
-            case PAYTM:
-                orders.setPaymentMode(PaymentMode.PAYTM.getPaymentModeId());
-                 paymentOptionData = paytmPaymentsService.getPaymentsOptionData(initiatePaymentRequestDto);
-                 break;
-            default:
 
+        if (initiatePaymentRequestDto.getActualOrderAmount().compareTo(BigDecimal.ZERO) > 0) {
+            PaymentMode paymentMode = PaymentMode.getPaymentModeById(initiatePaymentRequestDto.getPaymentModeId());
+            LOGGER.info("need to collect payment from external source");
+            switch (paymentMode) {
+                case PAYTM:
+                    paymentOptionData = paytmPaymentsService.getPaymentsOptionData(initiatePaymentRequestDto);
+                    OrderPayment orderPayment = new OrderPayment();
+                    orderPayment.setCompleted(false);
+                    orderPayment.setOrder(orders);
+                    orderPayment.setTotalOrderAmount(initiatePaymentRequestDto.getActualOrderAmount());// this is final discount paytm amount
+                    orderPayment.setTransactionType(TransactionType.DEBIT);
+                    orderPayment.setPaymentMode(PaymentMode.PAYTM);
+                    orderPaymentRepository.save(orderPayment);
+                    break;
+                default:
+            }
         }
-        OrderPayment orderPayment = new OrderPayment();
-        orderPayment.setCompleted(false);
-        orderPayment.setOrder(orders);
-        orderPayment.setTotalOrderAmount(initiatePaymentRequestDto.getTotalOrderAmount());// this is final discount paytm amount
-        orderPayment.setTransactionType(TransactionType.DEBIT);
-        orderPaymentRepository.save(orderPayment);
+
+        if (initiatePaymentRequestDto.getCosmosCashUsed().compareTo(BigDecimal.ZERO) > 0) {
+            OrderPayment orderPayment = new OrderPayment();
+            orderPayment.setCompleted(false);
+            orderPayment.setOrder(orders);
+            orderPayment.setTotalOrderAmount(initiatePaymentRequestDto.getActualOrderAmount());// this is final discount paytm amount
+            orderPayment.setTransactionType(TransactionType.DEBIT);
+            orderPayment.setPaymentMode(PaymentMode.COSMOS_CASH);
+            orderPaymentRepository.save(orderPayment);
+        }
 
         OmsRequest omsRequest = OmsRequest.builder()
                 .orderStatus(OrderStateEnum.ORDER_PAYMENT_INITIATE.getOrderState())
-                .orderUpdateMessage("Payment initiated with" + paymentMode)
+                .orderUpdateMessage("Payment initiated with external payment mode"
+                        + initiatePaymentRequestDto.getPaymentModeId())
                 .transactionId(initiatePaymentRequestDto.getTransactionId())
                 .userCode(initiatePaymentRequestDto.getUserCode())
                 .build();
         omsService.updateOrderStatus(omsRequest);
         return PaymentResponseDto.builder()
                 .paymentOptionData(paymentOptionData)
-                .totalAmount(initiatePaymentRequestDto.getTotalOrderAmount().toString())
+                .totalOrderAmount(initiatePaymentRequestDto.getTotalOrderAmount())
+                .actualOrderAmount(initiatePaymentRequestDto.getActualOrderAmount())
+                .cosmosCash(initiatePaymentRequestDto.getCosmosCashUsed())
                 .transactionId(initiatePaymentRequestDto.getTransactionId())
                 .build();
     }

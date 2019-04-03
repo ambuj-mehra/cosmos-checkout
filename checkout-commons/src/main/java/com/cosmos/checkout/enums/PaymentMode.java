@@ -22,19 +22,16 @@ public enum PaymentMode {
      * The Paytm payment mode
      */
     PAYTM(0, "https://securegw.paytm.in/theia/processTransaction",
-            "paytmlogo url", "7KiP62X1#IO2HwEJ", "SpeHqH11050895314462"),
+            "paytmlogo url", "7KiP62X1#IO2HwEJ", "SpeHqH11050895314462", true),
 
-    /**
-     * The Mobikwik.
-     */
-    COSMOS_CASH(1, null, "cosmos cash url", null, null);
-
+    COSMOS_CASH(1, null, "cosmos_cash logo", null, null, false);
 
     private Integer paymentModeId;
     private String paymentUrl;
     private String paymentModeLogo;
     private String paymentModeSecretkey;
     private String cosmosMerchantId;
+    private boolean isExternalMode;
 
     /**
      * The Payment modes.

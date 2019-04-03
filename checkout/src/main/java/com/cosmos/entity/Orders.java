@@ -56,9 +56,6 @@ public class Orders extends BaseEntity{
     @Column(name = "cosmos_cash", nullable = false)
     private BigDecimal cosmosCash;
 
-    @Column(name = "payment_mode")
-    private Integer paymentMode;
-
     @OneToOne(mappedBy = "orders", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     private OrderDiscount orderDiscount;
 
