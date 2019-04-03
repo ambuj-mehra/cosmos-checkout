@@ -29,7 +29,6 @@ public class OrderLite {
     private BigDecimal totalOrderAmount;
     private BigDecimal actualOrderAmount;
     private BigDecimal cosmosCash;
-    private Integer paymentModeId;
     private String userCode;
     private Long orderDate;
 
