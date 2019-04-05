@@ -33,7 +33,9 @@ public class CosmosCashServiceImpl implements ICosmosCashService {
     public CosmosCashDto getUserCosmosCashBalance(String userCode) {
         LOGGER.info("Getting cosmos balance for user :: {}", userCode);
         UserCosmosCash userCosmosCash = userCosmosCashRepository.findByUserCode(userCode);
-        Optional.ofNullable(userCosmosCash).orElseThrow(() -> new CheckoutException("Cosmos cash not found"));
+        if(userCosmosCash == null) {
+            return null;
+        }
         LOGGER.info("Cosmos cash available for user ::{} is  :: {}", userCode, userCosmosCash.getCosmosCash());
         return CosmosCashDto.builder()
                 .cosmosCash(userCosmosCash.getCosmosCash())

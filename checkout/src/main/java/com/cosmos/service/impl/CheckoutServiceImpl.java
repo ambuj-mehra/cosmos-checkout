@@ -58,7 +58,10 @@ public class CheckoutServiceImpl implements IcheckoutService {
     public InitiateCheckoutResponse initiateCheckout(InitiateCheckoutRequest initiateCheckoutRequest) {
         Orders checkoutOrder = checkoutUtils.getOrdersFromCheckoutRequest(initiateCheckoutRequest);
         CosmosCashDto userCosmosCash = cosmosCashService.getUserCosmosCashBalance(initiateCheckoutRequest.getUserCode());
-
+        if (userCosmosCash == null) {
+            LOGGER.info("Create new cosmos cash entry fr user :: {}", initiateCheckoutRequest.getUserCode());
+            userCosmosCash = cosmosCashService.creditCosmosCash(initiateCheckoutRequest.getUserCode(), BigDecimal.ZERO);
+        }
         if (checkoutOrder.getTotalOrderAmount().compareTo(userCosmosCash.getCosmosCash()) <= 0) {
             LOGGER.info("User :: {} has cosmos cash more thean total amount", initiateCheckoutRequest.getUserCode());
             checkoutOrder.setActualOrderAmount(BigDecimal.ZERO);
