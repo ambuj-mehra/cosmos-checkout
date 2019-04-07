@@ -21,8 +21,8 @@ public enum PaymentMode {
     /**
      * The Paytm payment mode
      */
-    PAYTM(0, "https://securegw.paytm.in/theia/processTransaction",
-            "paytmlogo url", "7KiP62X1#IO2HwEJ", "SpeHqH11050895314462", true),
+    PAYTM(0, "https://securegw-stage.paytm.in/theia/processTransaction",
+            "paytmlogo url", "aT2HMtSE!T9ovb9f", "fwLjWr93089220547348", true),
 
     COSMOS_CASH(1, null, "cosmos_cash logo", null, null, false);
 

@@ -35,17 +35,20 @@ public class TransactionLedgerServiceImpl {
      * @param transactionType  the transaction type
      * @param transactionState the transaction state
      * @param paymentMode payment mode
+     * @param transactionMessage  tranx message
+     *
      */
     @Transactional(propagation= Propagation.REQUIRED)
     public void addTransactionLedger(OmsRequest omsRequest, TransactionType transactionType,
-                                     TransactionState transactionState, BigDecimal transactionAmount, PaymentMode paymentMode) {
+                                     TransactionState transactionState, BigDecimal transactionAmount,
+                                     PaymentMode paymentMode, String transactionMessage) {
 
         TransactionLedger transactionLedger = new TransactionLedger();
         transactionLedger.setPaymentModeTransactionId(omsRequest.getPaymentModeTransactionId());
         transactionLedger.setTransactionId(omsRequest.getTransactionId());
         transactionLedger.setTransactionState(transactionState);
         transactionLedger.setType(transactionType);
-        transactionLedger.setTransactionMessage(omsRequest.getOrderUpdateMessage());
+        transactionLedger.setTransactionMessage(transactionMessage);
         transactionLedger.setUserCode(omsRequest.getUserCode());
         transactionLedger.setPaymentMode(paymentMode.getPaymentModeId());
         transactionLedger.setTransactionAmount(transactionAmount);

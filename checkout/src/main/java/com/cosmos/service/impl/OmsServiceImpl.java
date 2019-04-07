@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -81,22 +82,30 @@ public class OmsServiceImpl implements IomsService {
                         externalOrderPayment.setTransactionMessage(omsRequest.getOrderUpdateMessage());
                         externalOrderPayment.setCompleted(true);
                         transactionLedgerService.addTransactionLedger(omsRequest, TransactionType.DEBIT,
-                                TransactionState.SUCCESS, orders.getActualOrderAmount(), PaymentMode.PAYTM);
+                                TransactionState.SUCCESS, orders.getActualOrderAmount(), PaymentMode.PAYTM,
+                                omsRequest.getOrderUpdateMessage());
                     }
 
                     if (internalOrderPayments.size() == 1) {
                         OrderPayment internalOrderPayment = internalOrderPayments.get(0);
                         internalOrderPayment.setTransactionMessage("Cosmos Balance Debited");
                         internalOrderPayment.setCompleted(true);
+                        // for internal cosmos ledger transaction id is same
+                        internalOrderPayment.setPaymentModeTransactionId(omsRequest.getTransactionId());
                         transactionLedgerService.addTransactionLedger(omsRequest, TransactionType.DEBIT,
-                                TransactionState.SUCCESS, orders.getCosmosCash(), PaymentMode.COSMOS_CASH);
+                                TransactionState.SUCCESS, orders.getCosmosCash(), PaymentMode.COSMOS_CASH,
+                                "Cosmos Cash debit success");
                     }
                     orders.setOrderPayments(orderPayments);
                 } else if (updateStateRequest.equals(OrderStateEnum.ORDER_PAYMENT_FAILED)) {
-                    transactionLedgerService.addTransactionLedger(omsRequest, TransactionType.DEBIT,
-                            TransactionState.FAILED, orders.getActualOrderAmount(), PaymentMode.PAYTM);
-                    transactionLedgerService.addTransactionLedger(omsRequest, TransactionType.DEBIT,
-                            TransactionState.FAILED, orders.getCosmosCash(), PaymentMode.COSMOS_CASH);
+                    if (orders.getActualOrderAmount().compareTo(BigDecimal.ZERO) > 0)
+                        transactionLedgerService.addTransactionLedger(omsRequest, TransactionType.DEBIT,
+                            TransactionState.FAILED, orders.getActualOrderAmount(), PaymentMode.PAYTM,
+                                omsRequest.getOrderUpdateMessage());
+                    if (orders.getCosmosCash().compareTo(BigDecimal.ZERO) > 0)
+                        transactionLedgerService.addTransactionLedger(omsRequest, TransactionType.DEBIT,
+                            TransactionState.FAILED, orders.getCosmosCash(), PaymentMode.COSMOS_CASH,
+                                "Cosmos cash debit failed");
                 }
             }
             if (updateStateRequest.equals(OrderStateEnum.ORDER_SUCCESS)) {
@@ -110,7 +119,8 @@ public class OmsServiceImpl implements IomsService {
                 orders.setOrderPayments(orderPayments);
                 cosmosCashService.creditCosmosCash(omsRequest.getUserCode(), omsRequest.getPayoutAmount());
                 transactionLedgerService.addTransactionLedger(omsRequest, TransactionType.CREDIT,
-                        TransactionState.SUCCESS, omsRequest.getPayoutAmount(), PaymentMode.COSMOS_CASH);
+                        TransactionState.SUCCESS, omsRequest.getPayoutAmount(), PaymentMode.COSMOS_CASH,
+                        "Cosmos cash credit success");
 
             }
             ordersRepository.save(orders);
