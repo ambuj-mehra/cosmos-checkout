@@ -38,6 +38,14 @@ public interface ICosmosCashService {
     CosmosCashDto debitCosmosCash(String userCode, BigDecimal cosmosCash);
 
     /**
+     * Debit cosmos cash cosmos cash dto.
+     *
+     * @param transactionId the transaction id
+     * @return the cosmos cash dto
+     */
+    CosmosCashDto debitCosmosCash(String transactionId);
+
+    /**
      * Create cosmos wallet for user user cosmos cash.
      *
      * @param userCode             the user code

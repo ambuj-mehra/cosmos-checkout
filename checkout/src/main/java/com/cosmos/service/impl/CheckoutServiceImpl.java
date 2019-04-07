@@ -142,6 +142,7 @@ public class CheckoutServiceImpl implements IcheckoutService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public PaymentCallbackResponseDto initiateCallbackPayment(PaymentCallbackRequestDto paymentCallbackRequestDto) {
         PaymentMode paymentMode = PaymentMode.getPaymentModeById(paymentCallbackRequestDto.getPaymentModeId());
         String cosmosTransactionId;
@@ -172,6 +173,7 @@ public class CheckoutServiceImpl implements IcheckoutService {
                 if (paytmTransactionStatus) {
                     LOGGER.info("Received success response from paytm moving state to :: {}",
                             OrderStateEnum.ORDER_PAYMENT_SUCCESS);
+                    cosmosCashService.debitCosmosCash(cosmosTransactionId);
                     omsRequest.setOrderStatus(OrderStateEnum.ORDER_PAYMENT_SUCCESS.getOrderState());
                 } else {
                     LOGGER.info("Received failed response from paytm moving state to :: {}",
@@ -189,6 +191,9 @@ public class CheckoutServiceImpl implements IcheckoutService {
                         .tournamentCode(omsResponse.getTournamentCode())
                         .userCode(omsResponse.getUserCode())
                         .build();
+                break;
+
+            case COSMOS_CASH:
                 break;
             default:
         }

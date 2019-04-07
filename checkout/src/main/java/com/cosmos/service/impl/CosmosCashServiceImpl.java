@@ -1,6 +1,7 @@
 package com.cosmos.service.impl;
 
 import com.cosmos.checkout.dto.CosmosCashDto;
+import com.cosmos.checkout.dto.OrderLite;
 import com.cosmos.entity.UserCosmosCash;
 import com.cosmos.exception.CheckoutException;
 import com.cosmos.repository.UserCosmosCashRepository;
@@ -28,6 +29,9 @@ public class CosmosCashServiceImpl implements ICosmosCashService {
     @Autowired
     private UserCosmosCashRepository userCosmosCashRepository;
 
+    @Autowired
+    private OrderDetailsService orderDetailsService;
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public CosmosCashDto getUserCosmosCashBalance(String userCode) {
@@ -50,6 +54,7 @@ public class CosmosCashServiceImpl implements ICosmosCashService {
         UserCosmosCash userCosmosCash = userCosmosCashRepository.findByUserCode(userCode);
         Optional.ofNullable(userCosmosCash).orElseThrow(() -> new CheckoutException("Cosmos cash not found"));
         BigDecimal updatedCosmosCash = userCosmosCash.getCosmosCash().add(creditCosmosCash);
+        LOGGER.info("Updated cosmos cash is :: {}", updatedCosmosCash);
         userCosmosCash.setCosmosCash(updatedCosmosCash);
         userCosmosCash =  userCosmosCashRepository.save(userCosmosCash);
         return CosmosCashDto.builder()
@@ -65,6 +70,25 @@ public class CosmosCashServiceImpl implements ICosmosCashService {
         UserCosmosCash userCosmosCash = userCosmosCashRepository.findByUserCode(userCode);
         Optional.ofNullable(userCosmosCash).orElseThrow(() -> new CheckoutException("Cosmos cash not found"));
         BigDecimal updatedCosmosCash = userCosmosCash.getCosmosCash().subtract(debitCosmosCash);
+        userCosmosCash.setCosmosCash(updatedCosmosCash);
+        userCosmosCash = userCosmosCashRepository.save(userCosmosCash);
+        return CosmosCashDto.builder()
+                .cosmosCash(userCosmosCash.getCosmosCash())
+                .userCode(userCosmosCash.getUserCode())
+                .build();
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED)
+    public CosmosCashDto debitCosmosCash(String transactionId) {
+        OrderLite orderLite = orderDetailsService.fetchOrderLite(transactionId);
+        LOGGER.info("Credit cosmos balance for user :: {} with amount :: {}", orderLite.getUserCode(), orderLite.getCosmosCash());
+        UserCosmosCash userCosmosCash = userCosmosCashRepository.findByUserCode(orderLite.getUserCode());
+        Optional.ofNullable(userCosmosCash).orElseThrow(() -> new CheckoutException("Cosmos cash not found"));
+        if (orderLite.getCosmosCash().compareTo(userCosmosCash.getCosmosCash()) > 0) {
+            throw new CheckoutException("Debit cosmos cash exceeds actualcosmos cash");
+        }
+        BigDecimal updatedCosmosCash = userCosmosCash.getCosmosCash().subtract(orderLite.getCosmosCash());
         userCosmosCash.setCosmosCash(updatedCosmosCash);
         userCosmosCash = userCosmosCashRepository.save(userCosmosCash);
         return CosmosCashDto.builder()

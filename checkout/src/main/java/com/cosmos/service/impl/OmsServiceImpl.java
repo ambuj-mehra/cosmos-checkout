@@ -11,6 +11,7 @@ import com.cosmos.entity.OrderStateTransition;
 import com.cosmos.entity.Orders;
 import com.cosmos.exception.CheckoutException;
 import com.cosmos.repository.OrdersRepository;
+import com.cosmos.service.ICosmosCashService;
 import com.cosmos.service.IomsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +39,9 @@ public class OmsServiceImpl implements IomsService {
     @Autowired
     private TransactionLedgerServiceImpl transactionLedgerService;
 
+    @Autowired
+    private ICosmosCashService cosmosCashService;
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public OmsResponse updateOrderStatus(OmsRequest omsRequest) {
@@ -56,23 +60,44 @@ public class OmsServiceImpl implements IomsService {
             orderStateTransition.setOrder(orders);
             orderStateTransition.setOrderStatus(updateStateRequest.getOrderState());
             orders.getOrderStateTransitions().add(orderStateTransition);
+            // REFACTOR
             if (currentState.equals(OrderStateEnum.ORDER_PAYMENT_INITIATE) && (updateStateRequest.equals(
                     OrderStateEnum.ORDER_PAYMENT_SUCCESS) || updateStateRequest.equals(OrderStateEnum.ORDER_PAYMENT_FAILED))) {
-                List<OrderPayment> orderPayments = orders.getOrderPayments();
-                OrderPayment orderPayment = orderPayments.stream()
-                        .filter(orderPayment1 -> orderPayment1.getTransactionType().equals(TransactionType.DEBIT))
-                        .collect(Collectors.toList()).get(0);
-                orderPayment.setPaymentModeTransactionId(omsRequest.getPaymentModeTransactionId());
-                orderPayment.setTransactionMessage(omsRequest.getOrderUpdateMessage());
-                if (updateStateRequest.equals(OrderStateEnum.ORDER_PAYMENT_FAILED)) {
+                if (updateStateRequest.equals(OrderStateEnum.ORDER_PAYMENT_SUCCESS)) {
+                    List<OrderPayment> orderPayments = orders.getOrderPayments();
+                    List<OrderPayment> externalOrderPayments = orderPayments.stream()
+                            .filter(orderPayment1 -> orderPayment1.getTransactionType().equals(TransactionType.DEBIT)
+                                    && orderPayment1.getPaymentMode().equals(PaymentMode.PAYTM))
+                            .collect(Collectors.toList());
+
+                    List<OrderPayment> internalOrderPayments = orderPayments.stream()
+                            .filter(orderPayment1 -> orderPayment1.getTransactionType().equals(TransactionType.DEBIT)
+                                    && orderPayment1.getPaymentMode().equals(PaymentMode.COSMOS_CASH))
+                            .collect(Collectors.toList());
+
+                    if (externalOrderPayments.size() == 1) {
+                        OrderPayment externalOrderPayment = externalOrderPayments.get(0);
+                        externalOrderPayment.setPaymentModeTransactionId(omsRequest.getPaymentModeTransactionId());
+                        externalOrderPayment.setTransactionMessage(omsRequest.getOrderUpdateMessage());
+                        externalOrderPayment.setCompleted(true);
+                        transactionLedgerService.addTransactionLedger(omsRequest, TransactionType.DEBIT,
+                                TransactionState.SUCCESS, orders.getActualOrderAmount(), PaymentMode.PAYTM);
+                    }
+
+                    if (internalOrderPayments.size() == 1) {
+                        OrderPayment internalOrderPayment = internalOrderPayments.get(0);
+                        internalOrderPayment.setTransactionMessage("Cosmos Balance Debited");
+                        internalOrderPayment.setCompleted(true);
+                        transactionLedgerService.addTransactionLedger(omsRequest, TransactionType.DEBIT,
+                                TransactionState.SUCCESS, orders.getCosmosCash(), PaymentMode.COSMOS_CASH);
+                    }
+                    orders.setOrderPayments(orderPayments);
+                } else if (updateStateRequest.equals(OrderStateEnum.ORDER_PAYMENT_FAILED)) {
                     transactionLedgerService.addTransactionLedger(omsRequest, TransactionType.DEBIT,
-                            TransactionState.FAILED, orders.getTotalOrderAmount(), PaymentMode.PAYTM);
-                } else if (updateStateRequest.equals(OrderStateEnum.ORDER_PAYMENT_SUCCESS)){
-                    orderPayment.setCompleted(true);
+                            TransactionState.FAILED, orders.getActualOrderAmount(), PaymentMode.PAYTM);
                     transactionLedgerService.addTransactionLedger(omsRequest, TransactionType.DEBIT,
-                            TransactionState.SUCCESS, orders.getTotalOrderAmount(), PaymentMode.PAYTM);
+                            TransactionState.FAILED, orders.getCosmosCash(), PaymentMode.COSMOS_CASH);
                 }
-                orders.setOrderPayments(orderPayments);
             }
             if (updateStateRequest.equals(OrderStateEnum.ORDER_SUCCESS)) {
                 List<OrderPayment> orderPayments = orders.getOrderPayments();
@@ -83,8 +108,9 @@ public class OmsServiceImpl implements IomsService {
                 orderPayment.setTransactionType(TransactionType.CREDIT);
                 orderPayments.add(orderPayment);
                 orders.setOrderPayments(orderPayments);
+                cosmosCashService.creditCosmosCash(omsRequest.getUserCode(), omsRequest.getPayoutAmount());
                 transactionLedgerService.addTransactionLedger(omsRequest, TransactionType.CREDIT,
-                        TransactionState.SUCCESS, omsRequest.getPayoutAmount(), PaymentMode.PAYTM);
+                        TransactionState.SUCCESS, omsRequest.getPayoutAmount(), PaymentMode.COSMOS_CASH);
 
             }
             ordersRepository.save(orders);
