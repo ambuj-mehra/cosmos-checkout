@@ -148,7 +148,10 @@ public class CheckoutServiceImpl implements IcheckoutService {
         String cosmosTransactionId;
         String paymentsModeTransactionId;
         PaymentCallbackResponseDto paymentCallbackResponseDto = null;
+        OmsRequest omsRequest = null;
+        OmsResponse omsResponse = null;
         switch (paymentMode) {
+            //TODO ::  add factory
             case PAYTM:
                 boolean paytmTransactionStatus;
                 paymentCallbackRequestDto.getPaymentResponseParams().remove("ORDER_ID");
@@ -163,7 +166,7 @@ public class CheckoutServiceImpl implements IcheckoutService {
                 } else {
                     throw new CheckoutException("Could not get cosmos and payment mode transaction ids");
                 }
-                OmsRequest omsRequest = OmsRequest.builder()
+                omsRequest = OmsRequest.builder()
                         .orderUpdateMessage("Payment Response with " + paymentMode + "is " + paytmPaymentsService
                                 .getPaymentResponseMessage(paymentCallbackRequestDto.getPaymentResponseParams()))
                         .transactionId(paymentCallbackRequestDto.getPaymentResponseParams().get("ORDERID"))
@@ -180,23 +183,37 @@ public class CheckoutServiceImpl implements IcheckoutService {
                             OrderStateEnum.ORDER_PAYMENT_FAILED);
                     omsRequest.setOrderStatus(OrderStateEnum.ORDER_PAYMENT_FAILED.getOrderState());
                 }
-                OmsResponse omsResponse = omsService.updateOrderStatus(omsRequest);
-                paymentCallbackResponseDto = PaymentCallbackResponseDto.builder()
-                        .transactionId(omsResponse.getTransactionId())
-                        .orderStatus(omsResponse.getCurrentState())
-                        .totalOrderAmount(BigDecimal.valueOf(Double.valueOf(paymentCallbackRequestDto
-                                .getPaymentResponseParams().get("TXNAMOUNT"))))
-                        .gameCode(omsResponse.getGameCode())
-                        .platformCode(omsResponse.getPlatformCode())
-                        .tournamentCode(omsResponse.getTournamentCode())
-                        .userCode(omsResponse.getUserCode())
-                        .build();
+                omsResponse = omsService.updateOrderStatus(omsRequest);
                 break;
-
             case COSMOS_CASH:
+                cosmosTransactionId = paytmPaymentsService.getCosmosTransactionIdFromCallbackParams(
+                        paymentCallbackRequestDto.getPaymentResponseParams());
+                String paymentStatus = paymentCallbackRequestDto.getPaymentResponseParams().get("STATUS");
+                omsRequest = OmsRequest.builder()
+                        .orderUpdateMessage("Payment Response with Cosmos cash is success")
+                        .transactionId(cosmosTransactionId)
+                        .build();
+                if (paymentStatus.equals("TXN_SUCCESS")) {
+                    omsRequest.setOrderStatus(OrderStateEnum.ORDER_PAYMENT_SUCCESS.getOrderState());
+                } else if (paymentStatus.equals("TXN_FAILURE")) {
+                    omsRequest.setOrderStatus(OrderStateEnum.ORDER_PAYMENT_FAILED.getOrderState());
+                }
+
+                omsResponse = omsService.updateOrderStatus(omsRequest);
                 break;
             default:
         }
+
+        paymentCallbackResponseDto = PaymentCallbackResponseDto.builder()
+                .transactionId(omsResponse.getTransactionId())
+                .orderStatus(omsResponse.getCurrentState())
+                .totalOrderAmount(BigDecimal.valueOf(Double.valueOf(paymentCallbackRequestDto
+                        .getPaymentResponseParams().get("TXNAMOUNT"))))
+                .gameCode(omsResponse.getGameCode())
+                .platformCode(omsResponse.getPlatformCode())
+                .tournamentCode(omsResponse.getTournamentCode())
+                .userCode(omsResponse.getUserCode())
+                .build();
 
         return paymentCallbackResponseDto;
     }
