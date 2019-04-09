@@ -46,7 +46,8 @@ public interface ICosmosCashService {
     CosmosCashDto debitCosmosCash(String transactionId);
 
     /**
-     * Create cosmos wallet for user user cosmos cash.
+     * Create cosmos wallet for user user in case
+     * cosmos cash already created returns same cash
      *
      * @param userCode             the user code
      * @param initialCosmosBalance the initial cosmos balance
