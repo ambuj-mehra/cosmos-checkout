@@ -6,11 +6,6 @@ import lombok.*;
 
 import java.math.BigDecimal;
 
-/**
- * The type Order lite.
- *
- * @author ambujmehra
- */
 @Getter
 @Setter
 @Builder
@@ -19,17 +14,8 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class OrderLite {
+public class CosmosCashDto {
 
-    private String transactionId;
-    private String gameCode;
-    private String platformCode;
-    private String tournamentCode;
-    private Integer orderStatus;
-    private BigDecimal totalOrderAmount;
-    private BigDecimal actualOrderAmount;
     private BigDecimal cosmosCash;
     private String userCode;
-    private Long orderDate;
-
 }

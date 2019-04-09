@@ -7,10 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.math.BigDecimal;
-
 /**
- * The type Initiate payment request dto.
+ * The type Cosmos cash debit request dto.
  *
  * @author ambujmehra
  */
@@ -20,12 +18,8 @@ import java.math.BigDecimal;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @NoArgsConstructor
 @ToString
-public class InitiatePaymentRequestDto {
+public class CosmosCashDebitRequestDto {
 
-    private String transactionId;
-    private BigDecimal totalOrderAmount;
-    private BigDecimal actualOrderAmount;
-    private BigDecimal cosmosCashUsed;
-    private Integer paymentModeId; //  external payment mode
     private String userCode;
+    private String CosmosTransactionId;
 }

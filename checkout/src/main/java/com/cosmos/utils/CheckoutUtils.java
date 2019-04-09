@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.apache.commons.codec.binary.Hex;
 
+import java.math.BigDecimal;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
@@ -50,6 +51,7 @@ public class CheckoutUtils {
     public Orders getOrdersFromCheckoutRequest(InitiateCheckoutRequest initiateCheckoutRequest) {
         Orders orders = new Orders();
         orders.setActualOrderAmount(initiateCheckoutRequest.getTotalOrderAmount());
+        orders.setCosmosCash(BigDecimal.ZERO);
         orders.setGamecode(initiateCheckoutRequest.getGameCode());
         orders.setOrderDate(new Date(System.currentTimeMillis()));
         orders.setOrderStatus(OrderStateEnum.ORDER_CREATED.getOrderState());

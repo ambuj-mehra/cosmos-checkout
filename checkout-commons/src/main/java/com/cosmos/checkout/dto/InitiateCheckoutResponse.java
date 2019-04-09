@@ -26,6 +26,9 @@ public class InitiateCheckoutResponse {
 
     private String transactionId;
     private BigDecimal totalOrderAmount;
+    private BigDecimal actualOrderAmount;
+    private BigDecimal usableCosmosCash;
+    private BigDecimal totalCosmosCash;
     private Integer orderStatus;
     private String orderStateMessage;
     private Long orderDate;

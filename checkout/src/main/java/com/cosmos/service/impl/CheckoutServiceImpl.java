@@ -6,9 +6,11 @@ import com.cosmos.checkout.enums.PaymentMode;
 import com.cosmos.checkout.enums.TransactionType;
 import com.cosmos.entity.OrderPayment;
 import com.cosmos.entity.Orders;
+import com.cosmos.entity.UserCosmosCash;
 import com.cosmos.exception.CheckoutException;
 import com.cosmos.repository.OrderPaymentRepository;
 import com.cosmos.repository.OrdersRepository;
+import com.cosmos.service.ICosmosCashService;
 import com.cosmos.service.IcheckoutService;
 import com.cosmos.utils.CheckoutUtils;
 import org.slf4j.Logger;
@@ -47,16 +49,38 @@ public class CheckoutServiceImpl implements IcheckoutService {
     @Autowired
     private OmsServiceImpl omsService;
 
+    @Autowired
+    private ICosmosCashService cosmosCashService;
+
+
     @Override
     @org.springframework.transaction.annotation.Transactional(rollbackFor = Exception.class)
     public InitiateCheckoutResponse initiateCheckout(InitiateCheckoutRequest initiateCheckoutRequest) {
-        Orders orders = ordersRepository.save(checkoutUtils.getOrdersFromCheckoutRequest(initiateCheckoutRequest));
+        Orders checkoutOrder = checkoutUtils.getOrdersFromCheckoutRequest(initiateCheckoutRequest);
+        CosmosCashDto userCosmosCash = cosmosCashService.getUserCosmosCashBalance(initiateCheckoutRequest.getUserCode());
+        if (userCosmosCash == null) {
+            LOGGER.info("Create new cosmos cash entry fr user :: {}", initiateCheckoutRequest.getUserCode());
+            userCosmosCash = cosmosCashService.creditCosmosCash(initiateCheckoutRequest.getUserCode(), BigDecimal.ZERO);
+        }
+        if (checkoutOrder.getTotalOrderAmount().compareTo(userCosmosCash.getCosmosCash()) <= 0) {
+            LOGGER.info("User :: {} has cosmos cash more thean total amount", initiateCheckoutRequest.getUserCode());
+            checkoutOrder.setActualOrderAmount(BigDecimal.ZERO);
+            checkoutOrder.setCosmosCash(checkoutOrder.getTotalOrderAmount());
+        } else {
+            LOGGER.info("User :: {} has to do balance payment as cash is less", initiateCheckoutRequest.getUserCode());
+            checkoutOrder.setCosmosCash(userCosmosCash.getCosmosCash());
+            checkoutOrder.setActualOrderAmount(checkoutOrder.getTotalOrderAmount().subtract(userCosmosCash.getCosmosCash()));
+        }
+        Orders orders = ordersRepository.save(checkoutOrder);
         LOGGER.info("order created in checkout Db for user :: {} with orderid :: {} and trnx id :: {}",
                 initiateCheckoutRequest.getUserCode(), orders.getTransactionId(), orders.getTransactionId());
         return InitiateCheckoutResponse.builder()
-        .orderDate(orders.getOrderDate().getTime())
+                .orderDate(orders.getOrderDate().getTime())
                 .orderStatus(orders.getOrderStatus())
                 .totalOrderAmount(orders.getTotalOrderAmount())
+                .actualOrderAmount(orders.getActualOrderAmount())
+                .usableCosmosCash(orders.getCosmosCash())
+                .totalCosmosCash(userCosmosCash.getCosmosCash())
                 .transactionId(orders.getTransactionId())
                 .paymentOptions(Arrays.stream(PaymentMode.values())
                         .map(InitiateCheckoutResponse.PaymentOption::getFromPaymentMode)
@@ -70,44 +94,64 @@ public class CheckoutServiceImpl implements IcheckoutService {
 
         Orders orders = ordersRepository.findByTransactionId(initiatePaymentRequestDto.getTransactionId());
         Optional.ofNullable(orders).orElseThrow(() -> new CheckoutException("Order not found"));
-        PaymentMode paymentMode = PaymentMode.getPaymentModeById(initiatePaymentRequestDto.getPaymentModeId());
         PaymentResponseDto.PaymentOptionData paymentOptionData = null;
-        switch (paymentMode) {
-            case PAYTM:
-                orders.setPaymentMode(PaymentMode.PAYTM.getPaymentModeId());
-                 paymentOptionData = paytmPaymentsService.getPaymentsOptionData(initiatePaymentRequestDto);
-                 break;
-            default:
 
+        if (initiatePaymentRequestDto.getActualOrderAmount().compareTo(BigDecimal.ZERO) > 0) {
+            PaymentMode paymentMode = PaymentMode.getPaymentModeById(initiatePaymentRequestDto.getPaymentModeId());
+            LOGGER.info("need to collect payment from external source");
+            switch (paymentMode) {
+                case PAYTM:
+                    paymentOptionData = paytmPaymentsService.getPaymentsOptionData(initiatePaymentRequestDto);
+                    OrderPayment orderPayment = new OrderPayment();
+                    orderPayment.setCompleted(false);
+                    orderPayment.setOrder(orders);
+                    orderPayment.setTotalOrderAmount(initiatePaymentRequestDto.getActualOrderAmount());
+                    orderPayment.setTransactionType(TransactionType.DEBIT);
+                    orderPayment.setPaymentMode(PaymentMode.PAYTM);
+                    orderPaymentRepository.save(orderPayment);
+                    break;
+                default:
+            }
         }
-        OrderPayment orderPayment = new OrderPayment();
-        orderPayment.setCompleted(false);
-        orderPayment.setOrder(orders);
-        orderPayment.setTotalOrderAmount(initiatePaymentRequestDto.getTotalOrderAmount());// this is final discount paytm amount
-        orderPayment.setTransactionType(TransactionType.DEBIT);
-        orderPaymentRepository.save(orderPayment);
+
+        if (initiatePaymentRequestDto.getCosmosCashUsed().compareTo(BigDecimal.ZERO) > 0) {
+            OrderPayment orderPayment = new OrderPayment();
+            orderPayment.setCompleted(false);
+            orderPayment.setOrder(orders);
+            orderPayment.setTotalOrderAmount(initiatePaymentRequestDto.getCosmosCashUsed());
+            orderPayment.setTransactionType(TransactionType.DEBIT);
+            orderPayment.setPaymentMode(PaymentMode.COSMOS_CASH);
+            orderPaymentRepository.save(orderPayment);
+        }
 
         OmsRequest omsRequest = OmsRequest.builder()
                 .orderStatus(OrderStateEnum.ORDER_PAYMENT_INITIATE.getOrderState())
-                .orderUpdateMessage("Payment initiated with" + paymentMode)
+                .orderUpdateMessage("Payment initiated with external payment mode"
+                        + initiatePaymentRequestDto.getPaymentModeId())
                 .transactionId(initiatePaymentRequestDto.getTransactionId())
                 .userCode(initiatePaymentRequestDto.getUserCode())
                 .build();
         omsService.updateOrderStatus(omsRequest);
         return PaymentResponseDto.builder()
                 .paymentOptionData(paymentOptionData)
-                .totalAmount(initiatePaymentRequestDto.getTotalOrderAmount().toString())
+                .totalOrderAmount(initiatePaymentRequestDto.getTotalOrderAmount())
+                .actualOrderAmount(initiatePaymentRequestDto.getActualOrderAmount())
+                .cosmosCash(initiatePaymentRequestDto.getCosmosCashUsed())
                 .transactionId(initiatePaymentRequestDto.getTransactionId())
                 .build();
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public PaymentCallbackResponseDto initiateCallbackPayment(PaymentCallbackRequestDto paymentCallbackRequestDto) {
         PaymentMode paymentMode = PaymentMode.getPaymentModeById(paymentCallbackRequestDto.getPaymentModeId());
         String cosmosTransactionId;
         String paymentsModeTransactionId;
         PaymentCallbackResponseDto paymentCallbackResponseDto = null;
+        OmsRequest omsRequest = null;
+        OmsResponse omsResponse = null;
         switch (paymentMode) {
+            //TODO ::  add factory
             case PAYTM:
                 boolean paytmTransactionStatus;
                 paymentCallbackRequestDto.getPaymentResponseParams().remove("ORDER_ID");
@@ -122,7 +166,7 @@ public class CheckoutServiceImpl implements IcheckoutService {
                 } else {
                     throw new CheckoutException("Could not get cosmos and payment mode transaction ids");
                 }
-                OmsRequest omsRequest = OmsRequest.builder()
+                omsRequest = OmsRequest.builder()
                         .orderUpdateMessage("Payment Response with " + paymentMode + "is " + paytmPaymentsService
                                 .getPaymentResponseMessage(paymentCallbackRequestDto.getPaymentResponseParams()))
                         .transactionId(paymentCallbackRequestDto.getPaymentResponseParams().get("ORDERID"))
@@ -132,26 +176,44 @@ public class CheckoutServiceImpl implements IcheckoutService {
                 if (paytmTransactionStatus) {
                     LOGGER.info("Received success response from paytm moving state to :: {}",
                             OrderStateEnum.ORDER_PAYMENT_SUCCESS);
+                    cosmosCashService.debitCosmosCash(cosmosTransactionId);
                     omsRequest.setOrderStatus(OrderStateEnum.ORDER_PAYMENT_SUCCESS.getOrderState());
                 } else {
                     LOGGER.info("Received failed response from paytm moving state to :: {}",
                             OrderStateEnum.ORDER_PAYMENT_FAILED);
                     omsRequest.setOrderStatus(OrderStateEnum.ORDER_PAYMENT_FAILED.getOrderState());
                 }
-                OmsResponse omsResponse = omsService.updateOrderStatus(omsRequest);
-                paymentCallbackResponseDto = PaymentCallbackResponseDto.builder()
-                        .transactionId(omsResponse.getTransactionId())
-                        .orderStatus(omsResponse.getCurrentState())
-                        .totalOrderAmount(BigDecimal.valueOf(Double.valueOf(paymentCallbackRequestDto
-                                .getPaymentResponseParams().get("TXNAMOUNT"))))
-                        .gameCode(omsResponse.getGameCode())
-                        .platformCode(omsResponse.getPlatformCode())
-                        .tournamentCode(omsResponse.getTournamentCode())
-                        .userCode(omsResponse.getUserCode())
+                omsResponse = omsService.updateOrderStatus(omsRequest);
+                break;
+            case COSMOS_CASH:
+                cosmosTransactionId = paytmPaymentsService.getCosmosTransactionIdFromCallbackParams(
+                        paymentCallbackRequestDto.getPaymentResponseParams());
+                String paymentStatus = paymentCallbackRequestDto.getPaymentResponseParams().get("STATUS");
+                omsRequest = OmsRequest.builder()
+                        .orderUpdateMessage("Payment Response with Cosmos cash is success")
+                        .transactionId(cosmosTransactionId)
                         .build();
+                if (paymentStatus.equals("TXN_SUCCESS")) {
+                    omsRequest.setOrderStatus(OrderStateEnum.ORDER_PAYMENT_SUCCESS.getOrderState());
+                } else if (paymentStatus.equals("TXN_FAILURE")) {
+                    omsRequest.setOrderStatus(OrderStateEnum.ORDER_PAYMENT_FAILED.getOrderState());
+                }
+
+                omsResponse = omsService.updateOrderStatus(omsRequest);
                 break;
             default:
         }
+
+        paymentCallbackResponseDto = PaymentCallbackResponseDto.builder()
+                .transactionId(omsResponse.getTransactionId())
+                .orderStatus(omsResponse.getCurrentState())
+                .totalOrderAmount(BigDecimal.valueOf(Double.valueOf(paymentCallbackRequestDto
+                        .getPaymentResponseParams().get("TXNAMOUNT"))))
+                .gameCode(omsResponse.getGameCode())
+                .platformCode(omsResponse.getPlatformCode())
+                .tournamentCode(omsResponse.getTournamentCode())
+                .userCode(omsResponse.getUserCode())
+                .build();
 
         return paymentCallbackResponseDto;
     }
