@@ -64,7 +64,7 @@ public class PaytmPaymentsService implements IPaymentDetailsService {
             paymentOptionData = PaymentResponseDto.PaymentOptionData.builder()
                     .paymentModeId(initiatePaymentRequestDto.getPaymentModeId())
                     .cosmosMerchantId(paytmMid)
-                    .postingUrl(paymentGatewayUrl)
+                    .postingUrl(paymentGatewayUrl + "/theia/processTransaction")
                     .parameterMap(parameterMap)
                     .build();
         } catch (Exception exception) {
