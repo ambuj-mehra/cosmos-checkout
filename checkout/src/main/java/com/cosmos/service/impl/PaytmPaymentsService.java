@@ -92,7 +92,7 @@ public class PaytmPaymentsService implements IPaymentDetailsService {
     public void validateCallbackChecksum(Map<String, String> paymentsCallbackParams) {
         TreeMap<String, String> paytmParams = new TreeMap<>();
         String paytmChecksum = null;
-        boolean isValidChecksum = false;
+        boolean isValidChecksum;
         for (Map.Entry<String, String> requestParamsEntry : paymentsCallbackParams.entrySet()) {
             if ("CHECKSUMHASH".equalsIgnoreCase(requestParamsEntry.getKey()))
                 paytmChecksum = requestParamsEntry.getValue();
