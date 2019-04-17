@@ -67,4 +67,20 @@ public class CosmosCashController {
         return cosmosCashDto;
     }
 
+
+    /**
+     * Credit cosmos cash from wallet cosmos cash dto.
+     *
+     * @param cosmosCashCreateRequestDto the cosmos cash create request dto
+     * @return the cosmos cash dto
+     */
+    @RequestMapping(value = "/credit", method = RequestMethod.PUT)
+    public CosmosCashDto creditCosmosCashFromWallet(@RequestBody CosmosCashCreateRequestDto cosmosCashCreateRequestDto) {
+        LOGGER.info("received request to credit cosmos cash for user  :: {}", cosmosCashCreateRequestDto.getUserCode());
+        CosmosCashDto cosmosCashDto = cosmosCashService.creditCosmosCash(cosmosCashCreateRequestDto.getUserCode(),
+                cosmosCashCreateRequestDto.getInitialCosmosCash());
+        LOGGER.info("Cosmos cash updated is :: {}", cosmosCashDto.toString());
+        return cosmosCashDto;
+    }
+
 }
