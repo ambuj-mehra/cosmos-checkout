@@ -103,7 +103,7 @@ public class OrderDetailsService {
      */
     public List<OrderHistoryResponseDto> getuserHistory(String userCode, Integer page, Integer size) {
 
-        Pageable pageable = PageRequest.of(page, size, Sort.by("updatedAt").descending());
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
         List<TransactionLedger> transactionLedgers =  transactionLedgerRepository.findAllByUserCode(userCode, pageable);
         return transactionLedgers
                 .stream()

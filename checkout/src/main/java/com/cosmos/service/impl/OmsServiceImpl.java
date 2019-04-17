@@ -114,6 +114,7 @@ public class OmsServiceImpl implements IomsService {
                 orderPayment.setCompleted(true);
                 orderPayment.setOrder(orders);
                 orderPayment.setTotalOrderAmount(omsRequest.getPayoutAmount());
+                orderPayment.setPaymentMode(PaymentMode.COSMOS_CASH);
                 orderPayment.setTransactionType(TransactionType.CREDIT);
                 orderPayments.add(orderPayment);
                 orders.setOrderPayments(orderPayments);
@@ -121,16 +122,6 @@ public class OmsServiceImpl implements IomsService {
                 transactionLedgerService.addTransactionLedger(omsRequest, TransactionType.CREDIT,
                         TransactionState.SUCCESS, omsRequest.getPayoutAmount(), PaymentMode.COSMOS_CASH,
                         "Cosmos cash credit success");
-                // remove this code after tonights payout
-                cosmosCashService.debitCosmosCash(omsRequest.getUserCode(), omsRequest.getPayoutAmount());
-                transactionLedgerService.addTransactionLedger(omsRequest, TransactionType.DEBIT,
-                        TransactionState.SUCCESS, omsRequest.getPayoutAmount(), PaymentMode.COSMOS_CASH,
-                        "Cosmos cash debited success");
-                transactionLedgerService.addTransactionLedger(omsRequest, TransactionType.CREDIT,
-                        TransactionState.SUCCESS, omsRequest.getPayoutAmount(), PaymentMode.PAYTM,
-                        "Cosmos cash credit to Paytm");
-                // to be removed
-
             }
             ordersRepository.save(orders);
             return OmsResponse.builder()
