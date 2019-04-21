@@ -68,7 +68,7 @@ public class PaytmPaymentsService implements IPaymentDetailsService {
                     .parameterMap(parameterMap)
                     .build();
         } catch (Exception exception) {
-            throw new CheckoutException("Paytm param generation failed");
+            throw new CheckoutException("Paytm param generation failed", exception);
         }
         return paymentOptionData;
     }

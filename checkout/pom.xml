@@ -32,25 +32,25 @@
     </dependencyManagement>
 
 
-    <distributionManagement>
-        <snapshotRepository>
-            <id>Snapshots</id>
-            <name>Snapshots</name>
-            <url>http://35.237.45.33:8081/nexus/content/repositories/snapshots/</url>
-        </snapshotRepository>
-        <repository>
-            <id>Releases</id>
-            <name>Releases</name>
-            <url>http://35.237.45.33:8081/nexus/content/repositories/releases/</url>
-        </repository>
-    </distributionManagement>
-    <repositories>
-        <repository>
-            <id>public</id>
-            <name>public</name>
-            <url>http://35.237.45.33:8081/nexus/content/groups/public</url>
-        </repository>
-    </repositories>
+    <!--<distributionManagement>-->
+        <!--<snapshotRepository>-->
+            <!--<id>Snapshots</id>-->
+            <!--<name>Snapshots</name>-->
+            <!--<url>http://35.237.45.33:8081/nexus/content/repositories/snapshots/</url>-->
+        <!--</snapshotRepository>-->
+        <!--<repository>-->
+            <!--<id>Releases</id>-->
+            <!--<name>Releases</name>-->
+            <!--<url>http://35.237.45.33:8081/nexus/content/repositories/releases/</url>-->
+        <!--</repository>-->
+    <!--</distributionManagement>-->
+    <!--<repositories>-->
+        <!--<repository>-->
+            <!--<id>public</id>-->
+            <!--<name>public</name>-->
+            <!--<url>http://35.237.45.33:8081/nexus/content/groups/public</url>-->
+        <!--</repository>-->
+    <!--</repositories>-->
 
 
     <properties>
