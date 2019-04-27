@@ -62,15 +62,24 @@ public class CheckoutServiceImpl implements IcheckoutService {
             LOGGER.info("Create new cosmos cash entry fr user :: {}", initiateCheckoutRequest.getUserCode());
             userCosmosCash = cosmosCashService.createCosmosWalletForUser(initiateCheckoutRequest.getUserCode(), BigDecimal.ZERO);
         }
+        BigDecimal tournamentTotalAmount = checkoutOrder.getTotalOrderAmount();
+
+        checkoutOrder.setActualOrderAmount(initiateCheckoutRequest.getFixedPgAmount());
+        checkoutOrder.setTotalOrderAmount(checkoutOrder.getTotalOrderAmount().subtract(initiateCheckoutRequest.getFixedPgAmount()));
+
+
         if (checkoutOrder.getTotalOrderAmount().compareTo(userCosmosCash.getCosmosCash()) <= 0) {
-            LOGGER.info("User :: {} has cosmos cash more thean total amount", initiateCheckoutRequest.getUserCode());
-            checkoutOrder.setActualOrderAmount(BigDecimal.ZERO);
+            LOGGER.info("User :: {} has cosmos cash more than total amount", initiateCheckoutRequest.getUserCode());
+            checkoutOrder.setActualOrderAmount(checkoutOrder.getActualOrderAmount().add(BigDecimal.ZERO));
             checkoutOrder.setCosmosCash(checkoutOrder.getTotalOrderAmount());
         } else {
             LOGGER.info("User :: {} has to do balance payment as cash is less", initiateCheckoutRequest.getUserCode());
             checkoutOrder.setCosmosCash(userCosmosCash.getCosmosCash());
-            checkoutOrder.setActualOrderAmount(checkoutOrder.getTotalOrderAmount().subtract(userCosmosCash.getCosmosCash()));
+            checkoutOrder.setActualOrderAmount(checkoutOrder.getActualOrderAmount().add(
+                    checkoutOrder.getTotalOrderAmount().subtract(userCosmosCash.getCosmosCash())));
         }
+        // restore total order amount
+        checkoutOrder.setTotalOrderAmount(tournamentTotalAmount);
         Orders orders = ordersRepository.save(checkoutOrder);
         LOGGER.info("order created in checkout Db for user :: {} with orderid :: {} and trnx id :: {}",
                 initiateCheckoutRequest.getUserCode(), orders.getTransactionId(), orders.getTransactionId());

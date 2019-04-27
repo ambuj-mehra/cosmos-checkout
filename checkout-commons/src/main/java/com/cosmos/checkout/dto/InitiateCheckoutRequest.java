@@ -27,5 +27,6 @@ public class InitiateCheckoutRequest {
     private String userCode;
     private String tournamantCode;
     private BigDecimal totalOrderAmount;
+    private BigDecimal fixedPgAmount;
 
 }
