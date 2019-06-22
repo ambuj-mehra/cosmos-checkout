@@ -59,14 +59,22 @@ public class CosmosCashController {
      * @param cosmosCashDebitRequestDto the cosmos cash debit request dto
      * @return the cosmos cash dto
      */
-    @RequestMapping(value = "/debit", method = RequestMethod.PUT)
-    public CosmosCashDto debitCosmosCashFromWallet(@RequestBody CosmosCashDebitRequestDto cosmosCashDebitRequestDto) {
+    @RequestMapping(value = "/transaction/debit", method = RequestMethod.PUT)
+    public CosmosCashDto debitCosmosCashFromWalletForTransaction(@RequestBody CosmosCashDebitRequestDto cosmosCashDebitRequestDto) {
         LOGGER.info("received request to debit cosmos cash for user  :: {}", cosmosCashDebitRequestDto.getUserCode());
         CosmosCashDto cosmosCashDto = cosmosCashService.debitCosmosCash(cosmosCashDebitRequestDto.getCosmosTransactionId());
         LOGGER.info("Cosmos cash updated is :: {}", cosmosCashDto.toString());
         return cosmosCashDto;
     }
 
+    @RequestMapping(value = "/debit", method = RequestMethod.PUT)
+    public CosmosCashDto debitCosmosCashFromWallet(@RequestBody CosmosCashCreateRequestDto cosmosCashCreateRequestDto) {
+        LOGGER.info("received request to credit cosmos cash for user  :: {}", cosmosCashCreateRequestDto.getUserCode());
+        CosmosCashDto cosmosCashDto = cosmosCashService.debitCosmosCash(cosmosCashCreateRequestDto.getUserCode(),
+                cosmosCashCreateRequestDto.getInitialCosmosCash(), true);
+        LOGGER.info("Cosmos cash updated is :: {}", cosmosCashDto.toString());
+        return cosmosCashDto;
+    }
 
     /**
      * Credit cosmos cash from wallet cosmos cash dto.
@@ -78,7 +86,7 @@ public class CosmosCashController {
     public CosmosCashDto creditCosmosCashFromWallet(@RequestBody CosmosCashCreateRequestDto cosmosCashCreateRequestDto) {
         LOGGER.info("received request to credit cosmos cash for user  :: {}", cosmosCashCreateRequestDto.getUserCode());
         CosmosCashDto cosmosCashDto = cosmosCashService.creditCosmosCash(cosmosCashCreateRequestDto.getUserCode(),
-                cosmosCashCreateRequestDto.getInitialCosmosCash());
+                cosmosCashCreateRequestDto.getInitialCosmosCash(), true);
         LOGGER.info("Cosmos cash updated is :: {}", cosmosCashDto.toString());
         return cosmosCashDto;
     }
