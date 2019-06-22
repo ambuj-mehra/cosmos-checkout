@@ -114,7 +114,7 @@ public class CheckoutUtils {
         data[10] = (byte) (machineId.byteValue());
         data[11] = (byte) (count);
         encodeHexString = Hex.encodeHexString(data);
-        String name = initiateCheckoutRequest.getTournamantCode();
+        String name = initiateCheckoutRequest.getTournamantCode(); //tournmentcode will be generic name also
         String transactionId = name.substring(0, 1) + encodeHexString;
         LOGGER.info("transaction id generated for user :: {} and tournamanent :: {} is  :: {}",
                 initiateCheckoutRequest.getUserCode(), initiateCheckoutRequest.getTournamantCode(), transactionId);

@@ -26,7 +26,7 @@ public interface ICosmosCashService {
      * @param cosmosCash the cosmos cash
      * @return the user cosmos cash
      */
-    CosmosCashDto creditCosmosCash(String userCode, BigDecimal cosmosCash);
+    CosmosCashDto creditCosmosCash(String userCode, BigDecimal cosmosCash, boolean updateLedger);
 
     /**
      * Debit cosmos cash user cosmos cash.
@@ -35,7 +35,7 @@ public interface ICosmosCashService {
      * @param cosmosCash the cosmos cash
      * @return the user cosmos cash
      */
-    CosmosCashDto debitCosmosCash(String userCode, BigDecimal cosmosCash);
+    CosmosCashDto debitCosmosCash(String userCode, BigDecimal cosmosCash, boolean updateLedger);
 
     /**
      * Debit cosmos cash cosmos cash dto.

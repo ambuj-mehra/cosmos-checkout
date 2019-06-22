@@ -118,7 +118,7 @@ public class OmsServiceImpl implements IomsService {
                 orderPayment.setTransactionType(TransactionType.CREDIT);
                 orderPayments.add(orderPayment);
                 orders.setOrderPayments(orderPayments);
-                cosmosCashService.creditCosmosCash(omsRequest.getUserCode(), omsRequest.getPayoutAmount());
+                cosmosCashService.creditCosmosCash(omsRequest.getUserCode(), omsRequest.getPayoutAmount(), false);
                 transactionLedgerService.addTransactionLedger(omsRequest, TransactionType.CREDIT,
                         TransactionState.SUCCESS, omsRequest.getPayoutAmount(), PaymentMode.COSMOS_CASH,
                         "Cosmos cash credit success");
