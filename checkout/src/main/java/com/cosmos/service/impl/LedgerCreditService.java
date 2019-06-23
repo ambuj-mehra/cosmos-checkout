@@ -3,6 +3,9 @@ package com.cosmos.service.impl;
 import com.cosmos.checkout.dto.LedgerCreditRequestDto;
 import com.cosmos.checkout.dto.OmsRequest;
 import com.cosmos.checkout.enums.OrderStateEnum;
+import com.cosmos.checkout.enums.PaymentMode;
+import com.cosmos.checkout.enums.TransactionState;
+import com.cosmos.checkout.enums.TransactionType;
 import com.cosmos.entity.Orders;
 import com.cosmos.exception.CheckoutException;
 import com.cosmos.repository.OrdersRepository;
@@ -30,6 +33,9 @@ public class LedgerCreditService {
     @Autowired
     private OrdersRepository ordersRepository;
 
+    @Autowired
+    private TransactionLedgerServiceImpl transactionLedgerService;
+
     /**
      * Credit user ledger.
      *
@@ -49,6 +55,17 @@ public class LedgerCreditService {
                 .build();
         omsService.updateOrderStatus(omsRequest);
 
+    }
+
+
+    /**
+     * Credit user external payment ledger.
+     *
+     * @param ledgerCreditRequestDto the ledger credit request dto
+     */
+    public void creditUserExternalPaymentLedger(LedgerCreditRequestDto ledgerCreditRequestDto) {
+        transactionLedgerService.addTransactionLedger(ledgerCreditRequestDto.getUserCode(), "PAYTM_CREDIT", TransactionType.CREDIT,
+                TransactionState.SUCCESS, ledgerCreditRequestDto.getPrizeMoney(), PaymentMode.PAYTM, "Paytm wallet credit");
     }
 
 }

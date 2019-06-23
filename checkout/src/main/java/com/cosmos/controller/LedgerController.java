@@ -39,4 +39,11 @@ public class LedgerController {
         ledgerCreditService.creditUserLedger(ledgerCreditRequestDto);
     }
 
+    // to be deprecation, a hack should be done auto by above API
+    @RequestMapping(value = "/external/credit", method = RequestMethod.POST)
+    public void credtUserLedgerWithExternalPayment(@RequestBody LedgerCreditRequestDto ledgerCreditRequestDto) {
+        LOGGER.info("received add transcation ledger :: {}", ledgerCreditRequestDto.toString());
+        ledgerCreditService.creditUserExternalPaymentLedger(ledgerCreditRequestDto);
+    }
+
 }
