@@ -131,9 +131,9 @@ public class CosmosCashServiceImpl implements ICosmosCashService {
             userCosmosCash.setUserCode(userCode);
             userCosmosCash = userCosmosCashRepository.save(userCosmosCash);
 
-//            if (!initialCosmosBalance.equals(BigDecimal.ZERO))
-//                transactionLedgerService.addTransactionLedger(userCode, "INITIAL_GG_COINS", TransactionType.CREDIT,
-//                    TransactionState.SUCCESS, initialCosmosBalance, PaymentMode.COSMOS_CASH, "Inital walllet credit");
+            if (!initialCosmosBalance.equals(BigDecimal.ZERO))
+                transactionLedgerService.addTransactionLedger(userCode, "INITIAL_GG_COINS", TransactionType.CREDIT,
+                    TransactionState.SUCCESS, initialCosmosBalance, PaymentMode.COSMOS_CASH, "Inital walllet credit");
 
             return CosmosCashDto.builder()
                     .cosmosCash(userCosmosCash.getCosmosCash())
