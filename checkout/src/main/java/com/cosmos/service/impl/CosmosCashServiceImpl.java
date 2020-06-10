@@ -2,9 +2,6 @@ package com.cosmos.service.impl;
 
 import com.cosmos.checkout.dto.CosmosCashDto;
 import com.cosmos.checkout.dto.OrderLite;
-import com.cosmos.checkout.enums.PaymentMode;
-import com.cosmos.checkout.enums.TransactionState;
-import com.cosmos.checkout.enums.TransactionType;
 import com.cosmos.entity.UserCosmosCash;
 import com.cosmos.exception.CheckoutException;
 import com.cosmos.repository.UserCosmosCashRepository;
@@ -35,8 +32,6 @@ public class CosmosCashServiceImpl implements ICosmosCashService {
     @Autowired
     private OrderDetailsService orderDetailsService;
 
-    @Autowired
-    private TransactionLedgerServiceImpl transactionLedgerService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -63,11 +58,6 @@ public class CosmosCashServiceImpl implements ICosmosCashService {
         LOGGER.info("Updated cosmos cash is :: {}", updatedCosmosCash);
         userCosmosCash.setCosmosCash(updatedCosmosCash);
         userCosmosCash =  userCosmosCashRepository.save(userCosmosCash);
-
-        if (!creditCosmosCash.equals(BigDecimal.ZERO) && updateLedger)
-            transactionLedgerService.addTransactionLedger(userCode, "COSMOS_CASH_CREDIT", TransactionType.CREDIT,
-                    TransactionState.SUCCESS, creditCosmosCash, PaymentMode.COSMOS_CASH, "GG walllet credit");
-
         return CosmosCashDto.builder()
                 .cosmosCash(userCosmosCash.getCosmosCash())
                 .userCode(userCosmosCash.getUserCode())
@@ -83,12 +73,6 @@ public class CosmosCashServiceImpl implements ICosmosCashService {
         BigDecimal updatedCosmosCash = userCosmosCash.getCosmosCash().subtract(debitCosmosCash);
         userCosmosCash.setCosmosCash(updatedCosmosCash);
         userCosmosCash = userCosmosCashRepository.save(userCosmosCash);
-
-
-        if (!debitCosmosCash.equals(BigDecimal.ZERO) && updateLedger)
-            transactionLedgerService.addTransactionLedger(userCode, "COSMOS_CASH_DEBIT", TransactionType.DEBIT,
-                    TransactionState.SUCCESS, debitCosmosCash, PaymentMode.COSMOS_CASH, "GG walllet debit");
-
         return CosmosCashDto.builder()
                 .cosmosCash(userCosmosCash.getCosmosCash())
                 .userCode(userCosmosCash.getUserCode())
@@ -130,11 +114,6 @@ public class CosmosCashServiceImpl implements ICosmosCashService {
             userCosmosCash.setCosmosCash(initialCosmosBalance);
             userCosmosCash.setUserCode(userCode);
             userCosmosCash = userCosmosCashRepository.save(userCosmosCash);
-
-            if (!initialCosmosBalance.equals(BigDecimal.ZERO))
-                transactionLedgerService.addTransactionLedger(userCode, "INITIAL_GG_COINS", TransactionType.CREDIT,
-                    TransactionState.SUCCESS, initialCosmosBalance, PaymentMode.COSMOS_CASH, "Inital walllet credit");
-
             return CosmosCashDto.builder()
                     .cosmosCash(userCosmosCash.getCosmosCash())
                     .userCode(userCosmosCash.getUserCode())
