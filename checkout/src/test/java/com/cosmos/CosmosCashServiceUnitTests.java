@@ -103,7 +103,7 @@ public class CosmosCashServiceUnitTests {
                 .userCode(userCode)
                 .cosmosCash(BigDecimal.ZERO)
                 .build();
-        CosmosCashDto result = cosmosCashService.debitCosmosCash(userCode, BigDecimal.ZERO, true);
+        CosmosCashDto result = cosmosCashService.debitCosmosCash(userCode, BigDecimal.TEN, true);
         Assert.assertEquals(result.getCosmosCash(), expectedDto.getCosmosCash());
     }
 
